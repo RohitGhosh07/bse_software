@@ -1,11 +1,16 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import MainScreen from './screens/main_screen';
-import './App.css';
+import MenuScreen from './screens/menu_screen';
 
 function App() {
   return (
-    <div className="App">
-     <MainScreen />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<MainScreen />} />
+        <Route path="/menu" element={<MenuScreen />} />
+      </Routes>
+    </Router>
   );
 }
 

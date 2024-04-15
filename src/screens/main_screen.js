@@ -1,5 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 const MainScreen = () => {
+    const navigate = useNavigate();
+
     const [isOtpMode, setIsOtpMode] = useState(false);
     const [otp, setOtp] = useState(new Array(6).fill(""));
     const otpInputRefs = useRef(new Array(6).fill(null));
@@ -33,7 +37,7 @@ const MainScreen = () => {
             setIsOtpMode(true);
             setCounter(11); // Reset counter when moving to OTP mode
         } else {
-            // Handle OTP verification here
+            navigate('/menu'); // Navigate to the "another" screen on success
         }
     };
 
@@ -46,7 +50,7 @@ const MainScreen = () => {
             {/* Header section fixed at the top */}
             <div className="w-full fixed top-0 pt-4 bg-white">
                 <div className="flex flex-col items-center">
-                    <h1 className="text-2xl font-bold">Top Movers</h1>
+                    <h1 className="text-xl font-black">Top Movers</h1>
                     <div className="w-full h-8 bg-gray-200 mt-2 overflow-hidden relative">
                         <div className="ticker py-1 whitespace-nowrap">
                             {/* Repeatedly list items for a seamless ticker effect */}
@@ -109,14 +113,14 @@ const MainScreen = () => {
                 </div>
             </div>
 
-             {/* Center content with padding top to account for fixed header */}
+            {/* Center content with padding top to account for fixed header */}
             <div className="flex flex-col items-center justify-center w-full pt-24">
                 {/* Image in the center with fixed square size */}
                 <img src="https://i.ibb.co/gPPqZfg/bse-demo-logo.png"
                     alt="Center Image"
                     className="mt-0 w-175 h-135 object-cover" />
 
-<div className="px-10">
+                <div className="px-10">
                     {!isOtpMode ? (
                         <input
                             type="text"
@@ -146,13 +150,13 @@ const MainScreen = () => {
                             {isOtpMode ? "Verify OTP" : "Get Started"}
                         </button>
                         {isOtpMode && counter > 0 && (
-                            <p className="mt-2 text-sm text-gray-500">
+                            <p className="mt-2 text-sm flex justify-center text-gray-500">
                                 Resend OTP in {counter} sec
                             </p>
                         )}
                         {isOtpMode && counter === 0 && (
-                            <button onClick={resendOtp} className="mt-2 text-sm underline text-blue-500">
-                                Resend
+                            <button onClick={resendOtp} className="flex justify-center mt-2 text-sm underline text-blue-500">
+                                Resend the OTP
                             </button>
                         )}
                     </div>
