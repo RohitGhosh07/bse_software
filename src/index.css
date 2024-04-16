@@ -15,4 +15,15 @@
       transform: translateX(-100%);
     }
   }
+  /* Custom CSS for specific top shadow */
+  .bottomNavbarShadow::before {
+    content: '';
+    position: absolute;
+    top: -32px;  /* Start the shadow a bit higher */
+    left: 0;
+    right: 0;
+    height: 29px;  /* Increased height for a smoother gradient */
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.1) 0%, transparent 100%);
+    filter: blur(2px);
+  }
   

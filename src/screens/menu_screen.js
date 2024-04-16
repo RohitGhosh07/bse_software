@@ -102,12 +102,7 @@ const MenuScreen = () => {
                 </div>
             </div>
             <BottomNavbar />
-            {/* Floating Action Button */}
-            <button className="fixed bottom-20 right-4 p-3 bg-blue-500 rounded-full shadow-lg text-white hover:bg-blue-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-opacity-50">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2V6a1 1 0 00-1-1h-4m-4 0H6a1 1 0 00-1 1v3m13 4h-1v4a1 1 0 01-1 1H6a1 1 0 01-1-1v-4H4" />
-                </svg>
-            </button>
+            
         </div>
     );
 };

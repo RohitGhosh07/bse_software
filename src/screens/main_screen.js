@@ -114,11 +114,11 @@ const MainScreen = () => {
             </div>
 
             {/* Center content with padding top to account for fixed header */}
-            <div className="flex flex-col items-center justify-center w-full pt-24">
+            <div className="flex flex-col items-center justify-center w-full pt-0">
                 {/* Image in the center with fixed square size */}
-                <img src="https://i.ibb.co/gPPqZfg/bse-demo-logo.png"
+                <img src="/assets/icons/restraurenticon.svg"
                     alt="Center Image"
-                    className="mt-0 w-175 h-135 object-cover" />
+                    className="mt-0 w-179 h-135 object-cover" />
 
                 <div className="px-10">
                     {!isOtpMode ? (
