@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import BottomNavbar from '../components/bottomNavbar';
+import { Line } from 'react-chartjs-2';
+import 'chart.js/auto';  // This imports the necessary submodules
 
 const MarketScreen = () => {
     const foodItems = Array.from({ length: 40 }, (_, index) => ({
@@ -7,6 +9,18 @@ const MarketScreen = () => {
         type: `Type ${index % 5 + 1}`,
         number: Math.floor(Math.random() * 900 + 100)  // Random 3-digit number
     }));
+    const randomData = () => ({
+        labels: Array.from({length: 7}, (_, i) => `Point ${i + 1}`),
+        datasets: [
+            {
+                label: 'Sample Data',
+                data: Array.from({length: 7}, () => Math.floor(Math.random() * 1000)),
+                borderColor: 'rgb(127 29 29)',  // Red color for the line
+                backgroundColor: 'rgb(185 28 28)',  // Red with transparency for the area under the line
+            }
+        ]
+    });
+    
 
     const [selectedIdx, setSelectedIdx] = useState(null);
     const [counts, setCounts] = useState(new Array(40).fill(0));
@@ -95,10 +109,11 @@ const MarketScreen = () => {
                         </div>
                         {index === selectedIdx && (
                             <div className="w-full bg-white px-4 py-2 shadow-lg">
-                                <p>Details about {item.name}</p>
-                                {/* Additional details here */}
+                                {/* <p>Details about {item.name}</p> */}
+                                <Line data={randomData()} options={{ responsive: true, maintainAspectRatio: false }} />
                             </div>
                         )}
+
                     </React.Fragment>
                 ))}
             </div>
