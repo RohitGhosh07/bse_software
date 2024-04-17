@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import BottomNavbar from '../components/bottomNavbar';
 import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';  // This imports the necessary submodules
@@ -10,17 +10,17 @@ const MarketScreen = () => {
         number: Math.floor(Math.random() * 900 + 100)  // Random 3-digit number
     }));
     const randomData = () => ({
-        labels: Array.from({length: 7}, (_, i) => `Point ${i + 1}`),
+        labels: Array.from({ length: 7 }, (_, i) => `Point ${i + 1}`),
         datasets: [
             {
                 label: 'Sample Data',
-                data: Array.from({length: 7}, () => Math.floor(Math.random() * 1000)),
+                data: Array.from({ length: 7 }, () => Math.floor(Math.random() * 1000)),
                 borderColor: 'rgb(127 29 29)',  // Red color for the line
                 backgroundColor: 'rgb(185 28 28)',  // Red with transparency for the area under the line
             }
         ]
     });
-    
+
 
     const [selectedIdx, setSelectedIdx] = useState(null);
     const [counts, setCounts] = useState(new Array(40).fill(0));
@@ -32,6 +32,19 @@ const MarketScreen = () => {
         if (newCounts[index] < 0) newCounts[index] = 0;
         setCounts(newCounts);
     };
+    useEffect(() => {
+        const closeDropdown = (e) => {
+            setSelectedIdx(null);
+        };
+
+        // Attach the event listener
+        window.addEventListener('click', closeDropdown);
+
+        // Clean up the event listener
+        return () => {
+            window.removeEventListener('click', closeDropdown);
+        };
+    }, [selectedIdx]); // Effect runs only when selectedIdx changes
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
@@ -53,7 +66,17 @@ const MarketScreen = () => {
                     <React.Fragment key={index}>
                         <div
                             className={`flex justify-between items-center px-4 py-2 cursor-pointer ${index === selectedIdx ? 'bg-slate-300 text-black h-16' : 'border-b border-gray-200 text-gray-800 h-12'} ${selectedIdx !== null && index !== selectedIdx ? 'opacity-50' : ''}`}
-                            onClick={() => setSelectedIdx(index === selectedIdx ? null : index)}
+                            onClick={(e) => {
+                                e.stopPropagation();  // Prevent triggering closeDropdown
+                                if (index === selectedIdx) {
+                                    setSelectedIdx(null);
+                                } else if (selectedIdx !== null) {
+                                    setSelectedIdx(null);
+                                    // setTimeout(() => setSelectedIdx(index), 10);  // Delay selection to mimic a need for a new click
+                                } else {
+                                    setSelectedIdx(index);
+                                }
+                            }}
                         >
                             <div className="flex-grow flex flex-col">
                                 {index === selectedIdx ? (

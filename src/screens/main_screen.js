@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSnackbar } from '../components/Snackbar ';
 
 const MainScreen = () => {
     const navigate = useNavigate();
+    const { showSnackbar } = useSnackbar();
 
     const [isOtpMode, setIsOtpMode] = useState(false);
     const [otp, setOtp] = useState(new Array(6).fill(""));
@@ -36,8 +38,12 @@ const MainScreen = () => {
         if (!isOtpMode) {
             setIsOtpMode(true);
             setCounter(11); // Reset counter when moving to OTP mode
+            showSnackbar("OTP has been sent");
+
         } else {
             navigate('/menu'); // Navigate to the "another" screen on success
+            showSnackbar("Happy TRADING!!");
+
         }
     };
 
@@ -122,11 +128,15 @@ const MainScreen = () => {
 
                 <div className="px-10">
                     {!isOtpMode ? (
-                        <input
-                            type="text"
-                            placeholder="Phone number"
-                            className="mt-8 px-10 py-2 border border-black rounded-md shadow-sm w-full max-w-md text-center"
-                        />
+                       <input
+                       type="number"
+                       placeholder="Phone number"
+                       className="mt-8 px-10 py-2 border border-black rounded-md shadow-sm w-full max-w-md text-center"
+                       maxLength="10"
+                       pattern="\d*"
+                       onInput={e => e.target.value = e.target.value.slice(0, 10)} // Ensures the input is restricted to 10 digits
+                     />
+                     
                     ) : (
                         <div className="flex justify-center space-x-2 mt-8">
                             {otp.map((digit, index) => (
@@ -155,9 +165,13 @@ const MainScreen = () => {
                             </p>
                         )}
                         {isOtpMode && counter === 0 && (
-                            <button onClick={resendOtp} className="flex justify-center mt-2 text-sm underline text-blue-500">
-                                Resend the OTP
+                            <div className="flex justify-center text-sm"> <button onClick={resendOtp} className="flex justify-center mt-2 text-sm underline text-blue-500">
+                                Resend
                             </button>
+                                <span className="text-sm py-2">
+                                    &nbsp;the OTP
+                                </span>
+                            </div>
                         )}
                     </div>
                 </div>

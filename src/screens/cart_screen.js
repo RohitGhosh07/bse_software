@@ -12,14 +12,13 @@ const CartScreen = () => {
 
     const handleConfirmation = () => {
         console.log("Action Confirmed!");
-        navigate('/orders'); // Navigate to the "another" screen on success.
-        showSnackbar("Your Order is Placed!");
+
 
         // setShowSnackbar(true); // Show Snackbar
-        // setTimeout(() => {
-        //     setShowSnackbar(false); // Automatically hide Snackbar after some time
-        //     navigate('/orders'); // Navigate to the "another" screen on success
-        // }, 3000);
+        setTimeout(() => {
+            navigate('/orders'); // Navigate to the "another" screen on success.
+            showSnackbar("Your Order is Placed!");
+        }, 2000);
     };
     const Snackbar = ({ open, message, onClose }) => {
         if (!open) return null;

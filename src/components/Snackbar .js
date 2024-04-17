@@ -21,7 +21,7 @@ export const SnackbarProvider = ({ children }) => {
             {snackbar.open && (
                 <div style={{
                     position: 'fixed',
-                    bottom: '20px',
+                    bottom: '90px',
                     left: '50%',
                     transform: 'translateX(-50%)',
                     backgroundColor: 'black',
