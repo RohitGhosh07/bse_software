@@ -11,7 +11,7 @@ const BottomNavbar = () => {
     ];
 
     return (
-<div className="fixed bottom-0 left-0 right-0 bg-white bottomNavbarShadow">
+<div className="fixed z-50 bottom-0 left-0 right-0 bg-white bottomNavbarShadow">
             <div className="flex justify-around text-center py-2">
                 {navItems.map((item, index) => (
                     <Link key={index} to={item.path} className={`flex flex-col items-center ${location.pathname === item.path ? 'text-red-500' : ''}`}>
