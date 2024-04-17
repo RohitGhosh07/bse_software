@@ -3,6 +3,7 @@ import MainScreen from './screens/main_screen';
 import MenuScreen from './screens/menu_screen';
 import MarketScreen from './screens/market_screen';
 import CartScreen from './screens/cart_screen';
+import OrderScreen from './screens/oder_screen';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/menu" element={<MenuScreen />} />
         <Route path="/market" element={<MarketScreen />} />
         <Route path="/cart" element={<CartScreen />} />
+        <Route path="/orders" element={<OrderScreen />} />
       </Routes>
     </Router>
   );

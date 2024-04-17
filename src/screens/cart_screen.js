@@ -2,16 +2,52 @@ import React, { useState } from 'react';
 import BottomNavbar from '../components/bottomNavbar';
 import SwipeableToggle from '../components/SwipeToConfirm';
 import CountdownTimer from '../components/CountdownTimer';
+import { useNavigate } from 'react-router-dom';
+import { useSnackbar } from '../components/Snackbar ';
 
 const CartScreen = () => {
+    const navigate = useNavigate();
+    // const [showSnackbar, setShowSnackbar] = useState(false);
+    const { showSnackbar } = useSnackbar();
+
     const handleConfirmation = () => {
         console.log("Action Confirmed!");
-        // Implement any follow-up action here
+        navigate('/orders'); // Navigate to the "another" screen on success.
+        showSnackbar("Your Order is Placed!");
+
+        // setShowSnackbar(true); // Show Snackbar
+        // setTimeout(() => {
+        //     setShowSnackbar(false); // Automatically hide Snackbar after some time
+        //     navigate('/orders'); // Navigate to the "another" screen on success
+        // }, 3000);
+    };
+    const Snackbar = ({ open, message, onClose }) => {
+        if (!open) return null;
+
+        setTimeout(() => {
+            onClose();
+        }, 3000); // Snackbar will close after 3000 ms
+
+        return (
+            <div style={{
+                position: 'fixed',
+                bottom: '20px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                backgroundColor: 'black',
+                color: 'white',
+                padding: '8px 20px',
+                borderRadius: '4px',
+                zIndex: 1000
+            }}>
+                {message}
+            </div>
+        );
     };
 
     // Define categories and their items
     const categories = {
-        snacks: ["Chips", "Nachos", "Cookies","Biryani", "Paneer Tikka", "Samosa"],
+        snacks: ["Chips", "Nachos", "Cookies", "Biryani", "Paneer Tikka", "Samosa"],
         // indian: ["Biryani", "Paneer Tikka", "Samosa"],
         // chinese: ["Dim Sum", "Kung Pao Chicken", "Fried Rice"]
     };
@@ -85,6 +121,7 @@ const CartScreen = () => {
                 </div>
             </div>
 
+            {/* <Snackbar  /> */}
 
             <BottomNavbar />
         </div>

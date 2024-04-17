@@ -24,8 +24,13 @@ const SwipeableToggle = ({ onConfirm }) => {
         }
     };
 
-    const backgroundColor = isActive ? '#5cb85c' : `rgb(${255 - (position / maxPosition) * 255}, 255, ${255 - (position / maxPosition) * 255})`;
-    const circleColor = isActive ? '#5cb85c' : '#8C0B0D'; // Initially red, turns green when active
+// Calculate the background color transitioning towards RGB(140, 11, 13)
+const r = 255 - (position / maxPosition) * (255 - 140);  // Transition from 255 to 140
+const g = 255 - (position / maxPosition) * (255 - 11);   // Transition from 255 to 11
+const b = 255 - (position / maxPosition) * (255 - 13);   // Transition from 255 to 13
+
+const backgroundColor = `rgb(${r}, ${g}, ${b})`;
+    const circleColor = isActive ? '#8C0B0D' : '#8C0B0D'; // Initially red, turns green when active
 
     return (
         <div className="w-48 h-16 rounded-full relative overflow-hidden"
@@ -46,7 +51,7 @@ const SwipeableToggle = ({ onConfirm }) => {
             </div>
             {isActive ? (
                 <div className="absolute w-full text-center top-1/2 transform -translate-y-1/2">
-                    <span className="text-white font-bold">BOOKED</span>
+                    <span className="text-white px-2 font-bold">ORDER PLACED</span>
                 </div>
             ) : (
                 <div className="absolute ml-20 top-1/2 transform -translate-y-1/2"
