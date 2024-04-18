@@ -5,34 +5,48 @@ import { useSnackbar } from '../components/Snackbar ';
 const MainScreen = () => {
     const navigate = useNavigate();
     const { showSnackbar } = useSnackbar();
+    const initialOtp = Array(6).fill('');
 
     const [isOtpMode, setIsOtpMode] = useState(false);
     const [otp, setOtp] = useState(new Array(6).fill(""));
-    const otpInputRefs = useRef(new Array(6).fill(null));
-    const [counter, setCounter] = useState(11); // Set the initial counter to 11 seconds
+    // const otpInputRefs = useRef(new Array(6).fill(null));
+    const otpInputRefs = useRef([]);
 
+    const [counter, setCounter] = useState(11); // Set the initial counter to 11 seconds
     useEffect(() => {
         let interval = null;
         if (isOtpMode && counter > 0) {
             interval = setInterval(() => {
                 setCounter((prevCounter) => prevCounter - 1);
             }, 1000);
-        } else if (counter === 0) {
+        } else {
             clearInterval(interval);
         }
         return () => clearInterval(interval);
     }, [isOtpMode, counter]);
 
-    const handleOtpChange = (element, index) => {
-        const value = element.value;
+
+    const handleOtpChange = (target, index) => {
+        // const value = element.value;
         const newOtp = [...otp];
-        newOtp[index] = value;
+        newOtp[index] = target.value.slice(0, 1); // Take only the first character
+
+        // newOtp[index] = value;
         setOtp(newOtp);
 
-        if (value.length === 1 && index < 5) {
+        if (index < 5 && target.value && otpInputRefs.current[index + 1]) {
             otpInputRefs.current[index + 1].focus();
         }
+        if (index > 0 && !target.value && otpInputRefs.current[index - 1]) {
+            otpInputRefs.current[index - 1].focus();
+        }
+
     };
+    useEffect(() => {
+        if (otpInputRefs.current[0]) {
+            otpInputRefs.current[0].focus();
+        }
+    }, []);
 
     const handleButtonClick = () => {
         if (!isOtpMode) {
@@ -63,22 +77,27 @@ const MainScreen = () => {
                             {Array.from({ length: 80 }).map((_, index) => (
                                 <div key={index} className="inline-flex items-center mr-0">
                                     {/* Food name in bold and black */}
-                                    <span className="font-bold text-black mr-2">
+                                    <span className="font-black text-black mr-2">
                                         Pizza
                                     </span>
                                     {/* Vertical bar separator */}
                                     {/* Percentage and color-coded arrow */}
-                                    <span className={`font-bold ${index % 2 === 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                        {Math.floor(Math.random() * 100)}
+                                    <span className={`px-1 font-bold ${index % 2 === 0 ? 'text-green-800' : 'text-red-600'}`}>
+                                        {Math.floor(Math.random() * 100)}.00
                                     </span>
                                     {index % 2 === 0
-                                        ? <svg className="w-4 h-4 ml-1 mr-1 fill-current text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2l5 9H7z" /></svg>  // Arrow up
-                                        : <svg className="w-4 h-4 ml-1 mr-1 fill-current text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 22l-5-9h10z" /></svg> // Arrow down
+                                        ? <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" stroke-width="2" />
+                                        </svg>
+
+                                        : <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M9.5 12.5L2 1H17L9.5 12.5Z" fill="#D82222" stroke="#D82222" stroke-width="2" />
+                                        </svg>
                                     }
                                     {/* Vertical bar separator */}
                                     {/* Another random number */}
-                                    <span className={`font-bold ${index % 2 === 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                        {Math.floor(Math.random() * 100)}
+                                    <span className={`px-1 font-bold ${index % 2 === 0 ? 'text-green-800' : 'text-red-600'}`}>
+                                        {Math.floor(Math.random() * 100)}.00
                                     </span>
                                     <span className="mx-2 text-gray-500">|</span>
 
@@ -98,17 +117,22 @@ const MainScreen = () => {
                                     </span>
                                     {/* Vertical bar separator */}
                                     {/* Percentage and color-coded arrow */}
-                                    <span className={`font-bold ${index % 2 === 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                        {Math.floor(Math.random() * 100)}
+                                    <span className={`px-1 font-bold ${index % 2 === 0 ? 'text-green-800' : 'text-red-600'}`}>
+                                        {Math.floor(Math.random() * 100)}.00
                                     </span>
                                     {index % 2 === 0
-                                        ? <svg className="w-4 h-4 ml-1 mr-1 fill-current text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2l5 9H7z" /></svg>  // Arrow up
-                                        : <svg className="w-4 h-4 ml-1 mr-1 fill-current text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 22l-5-9h10z" /></svg> // Arrow down
+                                        ? <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" stroke-width="2" />
+                                        </svg>
+
+                                        : <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M9.5 12.5L2 1H17L9.5 12.5Z" fill="#D82222" stroke="#D82222" stroke-width="2" />
+                                        </svg>
                                     }
                                     {/* Vertical bar separator */}
                                     {/* Another random number */}
-                                    <span className={`font-bold ${index % 2 === 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                        {Math.floor(Math.random() * 100)}
+                                    <span className={`px-1 font-bold ${index % 2 === 0 ? 'text-green-800' : 'text-red-600'}`}>
+                                        {Math.floor(Math.random() * 100)}.00
                                     </span>
                                     <span className="mx-2 text-gray-500">|</span>
 
@@ -128,15 +152,15 @@ const MainScreen = () => {
 
                 <div className="px-10">
                     {!isOtpMode ? (
-                       <input
-                       type="number"
-                       placeholder="Phone number"
-                       className="mt-8 px-10 py-2 border border-black rounded-md shadow-sm w-full max-w-md text-center"
-                       maxLength="10"
-                       pattern="\d*"
-                       onInput={e => e.target.value = e.target.value.slice(0, 10)} // Ensures the input is restricted to 10 digits
-                     />
-                     
+                        <input
+                            type="number"
+                            placeholder="Phone number"
+                            className="mt-8 px-10 py-2 border border-black rounded-md shadow-sm w-full max-w-md text-center"
+                            maxLength="10"
+                            pattern="\d*"
+                            onInput={e => e.target.value = e.target.value.slice(0, 10)} // Ensures the input is restricted to 10 digits
+                        />
+
                     ) : (
                         <div className="flex justify-center space-x-2 mt-8">
                             {otp.map((digit, index) => (

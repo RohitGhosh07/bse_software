@@ -49,17 +49,23 @@ const MenuScreen = () => {
                                     </span>
                                     {/* Vertical bar separator */}
                                     {/* Percentage and color-coded arrow */}
-                                    <span className={`font-bold ${index % 2 === 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                        {Math.floor(Math.random() * 100)}
+                                    <span className={`px-1 font-bold ${index % 2 === 0 ? 'text-green-800' : 'text-red-500'}`}>
+                                        {Math.floor(Math.random() * 100)}.00
                                     </span>
                                     {index % 2 === 0
-                                        ? <svg className="w-4 h-4 ml-1 mr-1 fill-current text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2l5 9H7z" /></svg>  // Arrow up
-                                        : <svg className="w-4 h-4 ml-1 mr-1 fill-current text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 22l-5-9h10z" /></svg> // Arrow down
+                                        ? <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" stroke-width="2" />
+                                        </svg>
+
+                                        : <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M9.5 12.5L2 1H17L9.5 12.5Z" fill="#D82222" stroke="#D82222" stroke-width="2" />
+                                        </svg>
+
                                     }
                                     {/* Vertical bar separator */}
                                     {/* Another random number */}
-                                    <span className={`font-bold ${index % 2 === 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                        {Math.floor(Math.random() * 100)}
+                                    <span className={`px-1 font-bold ${index % 2 === 0 ? 'text-green-800' : 'text-red-500'}`}>
+                                        {Math.floor(Math.random() * 100)}.00
                                     </span>
                                     <span className="mx-2 text-gray-500">|</span>
 
@@ -81,12 +87,12 @@ const MenuScreen = () => {
                                 <div className="">
                                     {categories[category].map((item, index) => (
                                         <div key={index} className="flex justify-between items-center p-2 hover:bg-green-100">
-                                           <div className="flex justify-start">
-                                           <span className="text-black mr-2">{item}</span>
-                                            {Math.floor(Math.random() * 100)}
-                                            <svg className="w-8 h-8 fill-current text-green-800" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 18"><path d="M12 2l5 9H7z" /></svg>
-                                            {Math.floor(Math.random() * 100)}
-                                           </div>
+                                            <div className="flex justify-start">
+                                                <span className="text-black mr-2">{item}</span>
+                                                {Math.floor(Math.random() * 100)}
+                                                <svg className="w-8 h-8 fill-current text-green-800" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 18"><path d="M12 2l5 9H7z" /></svg>
+                                                {Math.floor(Math.random() * 100)}
+                                            </div>
 
                                             <div className="flex items-center border border-red-800 rounded-md px-2">
                                                 <button className="focus:outline-none" onClick={() => handleCountChange(category, index, -1)}>➖</button>
@@ -102,7 +108,7 @@ const MenuScreen = () => {
                 </div>
             </div>
             <BottomNavbar />
-            
+
         </div>
     );
 };
