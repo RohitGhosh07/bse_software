@@ -56,7 +56,7 @@ const MainScreen = () => {
 
         } else {
             navigate('/menu'); // Navigate to the "another" screen on success
-            showSnackbar("Happy TRADING!!");
+            // showSnackbar("Happy TRADING!!");
 
         }
     };

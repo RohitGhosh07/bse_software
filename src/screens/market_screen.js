@@ -65,7 +65,7 @@ const MarketScreen = () => {
                 {foodItems.map((item, index) => (
                     <React.Fragment key={index}>
                         <div
-                            className={`flex justify-between items-center px-4 py-2 cursor-pointer ${index === selectedIdx ? 'bg-slate-300 text-black h-16' : 'border-b border-gray-200 text-gray-800 h-12'} ${selectedIdx !== null && index !== selectedIdx ? 'opacity-50' : ''}`}
+                            className={`flex justify-between items-center px-4 py-2 cursor-pointer ${index === selectedIdx ? 'bg-slate-200 text-black h-16' : 'border-b border-gray-200 text-gray-800 h-12'} ${selectedIdx !== null && index !== selectedIdx ? 'opacity-50' : ''}`}
                             onClick={(e) => {
                                 e.stopPropagation();  // Prevent triggering closeDropdown
                                 if (index === selectedIdx) {
@@ -94,9 +94,16 @@ const MarketScreen = () => {
                                             <div className="flex px-2">
                                                 <div className="text-xs font-bold">{item.number}.00</div>
                                                 <div className="text-xs flex items-center justify-end space-x-2 ml-2">
-                                                    +{Math.floor(Math.random() * 100)}
-                                                    <svg className="w-3 h-3 fill-current text-green-800" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 18"><path d="M12 2l5 9H7z" /></svg>
-                                                    {Math.floor(Math.random() * 100)}%
+                                                    <div className="mr-0 text-green-800">
+                                                        +{Math.floor(Math.random() * 100)}
+                                                    </div>
+                                                    <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" stroke-width="2" />
+                                                    </svg>
+                                                    <div className="ml-0 text-green-800">
+                                                        {Math.floor(Math.random() * 100)}%
+
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -110,9 +117,16 @@ const MarketScreen = () => {
                                         <div className="text-right -mt-10">
                                             <div className="font-bold">{item.number}</div>
                                             <div className="text-xs flex items-center justify-end space-x-2 ml-2">
-                                                +{Math.floor(Math.random() * 100)}
-                                                <svg className="w-3 h-3 fill-current text-green-800" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 18"><path d="M12 2l5 9H7z" /></svg>
-                                                {Math.floor(Math.random() * 100)}%
+                                                <div className="mr-0 text-green-800">
+                                                    +{Math.floor(Math.random() * 100)}.00
+                                                </div>
+                                                <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" stroke-width="2" />
+                                                </svg>
+                                                <div className="ml-0 text-green-800">
+                                                   +{Math.floor(Math.random() * 100)}%
+
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

@@ -46,8 +46,8 @@ const OrderScreen = () => {
                                     </div>
                                     <div className="flex items-center text-xs justify-end space-x-2">
                                         <span>LTP {Math.floor(Math.random() * 100)}.00</span>
-                                        <svg className="w-3 h-3 fill-current text-green-800" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 18">
-                                            <path d="M12 2l5 9H7z" />
+                                        <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" stroke-width="2" />
                                         </svg>
                                         <span>+{Math.floor(Math.random() * 100)}%</span>
                                     </div>

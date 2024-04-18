@@ -2,8 +2,14 @@ import React, { useState } from 'react';
 import BottomNavbar from '../components/bottomNavbar';
 
 const MenuScreen = () => {
+        // Define categories and their items
+        const categories = {
+            snacks: ["Chips", "Nachos", "Cookies"],
+            indian: ["Biryani", "Paneer Tikka", "Samosa"],
+            chinese: ["Dim Sum", "Kung Pao Chicken", "Fried Rice"]
+        };
     // State to manage open/close of different dropdowns
-    const [openDropdown, setOpenDropdown] = useState(null);
+    const [openDropdown, setOpenDropdown] = useState(Object.keys(categories)[0]);
 
     // Initialize item counts for each category
     const initialCounts = {
@@ -25,12 +31,7 @@ const MenuScreen = () => {
         setCounts(newCounts);
     };
 
-    // Define categories and their items
-    const categories = {
-        snacks: ["Chips", "Nachos", "Cookies"],
-        indian: ["Biryani", "Paneer Tikka", "Samosa"],
-        chinese: ["Dim Sum", "Kung Pao Chicken", "Fried Rice"]
-    };
+
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen ">
@@ -86,13 +87,20 @@ const MenuScreen = () => {
                             {openDropdown === category && (
                                 <div className="">
                                     {categories[category].map((item, index) => (
-                                        <div key={index} className="flex justify-between items-center p-2 hover:bg-green-100">
+                                        <div key={index} className="flex justify-between items-center p-2 hover:bg-slate-100">
                                             <div className="flex justify-start">
                                                 <span className="text-black mr-2">{item}</span>
-                                                {Math.floor(Math.random() * 100)}
-                                                <svg className="w-8 h-8 fill-current text-green-800" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 18"><path d="M12 2l5 9H7z" /></svg>
-                                                {Math.floor(Math.random() * 100)}
-                                            </div>
+                                                <div className="mr-2 text-green-800">
+                                                    {Math.floor(Math.random() * 100)}.00
+
+                                                </div>
+                                                <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" stroke-width="2" />
+                                                </svg>
+                                                <div className="ml-2 text-green-800">
+                                                    {Math.floor(Math.random() * 100)}.00
+
+                                                </div>                                            </div>
 
                                             <div className="flex items-center border border-red-800 rounded-md px-2">
                                                 <button className="focus:outline-none" onClick={() => handleCountChange(category, index, -1)}>➖</button>
