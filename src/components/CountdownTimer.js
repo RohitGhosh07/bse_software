@@ -19,11 +19,13 @@ const CountdownTimer = () => {
         <>
             <div className="flex justify-center items-center w-full mt-4">
                 <div className="text-center text-xs font-black">
-                    <span className="text-red-700 font-bold">{seconds}</span>
+                    <span className="text-red-700 font-bold" style={{ minWidth: '20px', display: 'inline-block' }}>{seconds}</span>
                     <span className="text-black"> seconds remaining</span>
                 </div>
             </div>
-            <div className="flex justify-center items-center w-full  text-black text-xs"> before price updates</div></>
+            <div className="flex justify-center items-center w-full text-black text-xs"> before price updates</div>
+
+        </>
 
     );
 };

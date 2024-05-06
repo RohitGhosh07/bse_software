@@ -36,7 +36,7 @@ const SwipeableToggle = ({ onConfirm }) => {
         <div className="w-60 h-16 rounded-full relative overflow-hidden"
             style={{ backgroundColor, border: '1px solid black' }}>
             <div
-                className="slider-thumb w-14 h-14 rounded-full absolute flex items-center justify-center"
+                className="slider-thumb mx-1 w-14 h-14 rounded-full absolute flex items-center justify-center"
                 style={{ left: `${position}px`, transition: 'left 0.2s', top: '50%', transform: 'translateY(-50%)', backgroundColor: circleColor }}
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
@@ -54,10 +54,11 @@ const SwipeableToggle = ({ onConfirm }) => {
                     <span className="text-white px-2 font-bold">ORDER PLACED</span>
                 </div>
             ) : (
-                <div className="absolute ml-20 top-1/2 transform -translate-y-1/2"
-                    style={{ opacity: (100 - (position / maxPosition) * 100) / 100, transition: 'opacity 0.2s' }}>
-                    <span className="text-xs font-medium text-gray-700">SWIPE TO PLACE ORDER</span>
+                <div className="absolute top-1/2 transform -translate-y-1/2"
+                    style={{ marginLeft: '68px', opacity: (100 - (position / maxPosition) * 100) / 100, transition: 'opacity 0.2s' }}>
+                    <span className="text-xs font-black text-gray-900">SWIPE TO PLACE ORDER</span>
                 </div>
+
             )}
         </div>
     );

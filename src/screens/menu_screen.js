@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import BottomNavbar from '../components/bottomNavbar';
 
 const MenuScreen = () => {
-        // Define categories and their items
-        const categories = {
-            snacks: ["Chips", "Nachos", "Cookies"],
-            indian: ["Biryani", "Paneer Tikka", "Samosa"],
-            chinese: ["Dim Sum", "Kung Pao Chicken", "Fried Rice"]
-        };
+    // Define categories and their items
+    const categories = {
+        snacks: ["Chips", "Chesse Nachos", "Cookies"],
+        indian: ["Biryani", "Paneer Tikka", "Samosa"],
+        chinese: ["Dim Sum", "Kung Pao Chicken", "Fried Rice"]
+    };
     // State to manage open/close of different dropdowns
     const [openDropdown, setOpenDropdown] = useState(Object.keys(categories)[0]);
 
@@ -87,27 +87,34 @@ const MenuScreen = () => {
                             {openDropdown === category && (
                                 <div className="">
                                     {categories[category].map((item, index) => (
-                                        <div key={index} className="flex justify-between items-center p-2 hover:bg-slate-100">
-                                            <div className="flex justify-start">
-                                                <span className="text-black mr-2">{item}</span>
-                                                <div className="mr-2 text-green-800">
-                                                    {Math.floor(Math.random() * 100)}.00
-
-                                                </div>
-                                                <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" stroke-width="2" />
-                                                </svg>
-                                                <div className="ml-2 text-green-800">
-                                                    {Math.floor(Math.random() * 100)}.00
-
-                                                </div>                                            </div>
-
-                                            <div className="flex items-center border border-red-800 rounded-md px-2">
-                                                <button className="focus:outline-none" onClick={() => handleCountChange(category, index, -1)}>➖</button>
-                                                <span className="mx-2">{counts[category][index]}</span>
-                                                <button className="focus:outline-none" onClick={() => handleCountChange(category, index, 1)}>➕</button>
-                                            </div>
-                                        </div>
+                                       <div key={index} className="flex justify-between items-center p-2 hover:bg-slate-100">
+                                       <div className="flex justify-start">
+                                           <span className="text-black mr-0" style={{ width: "100px" }}>
+                                               {item.length > 10 ? `${item.substring(0, 10)}...` : item}
+                                           </span>
+                                           <div className="flex items-center">
+                                               <div className="text-green-800 mr-1 " style={{ width: "40px" }}>
+                                                   {Math.floor(Math.random() * 100)}.00
+                                               </div>
+                                               <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                   <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" strokeWidth="2" />
+                                               </svg>
+                                               <div className="ml-1 text-green-800" style={{ width: "45px" }}>
+                                                   {Math.floor(Math.random() * 100)}.00
+                                               </div>
+                                           </div>
+                                       </div>
+                                   
+                                       <div className="flex items-center">
+                                           <div className="flex justify-end items-center border border-red-800 rounded-md px-2">
+                                               <button className="focus:outline-none" onClick={() => handleCountChange(category, index, -1)}>➖</button>
+                                               <span className="mx-2" style={{ minWidth: "2rem", textAlign: "center" }}>{counts[category][index]}</span>
+                                               <button className="focus:outline-none" onClick={() => handleCountChange(category, index, 1)}>➕</button>
+                                           </div>
+                                           <div style={{ height: "1px", backgroundColor: "rgba(0, 0, 0, 0.12)" }} />
+                                       </div>
+                                   </div>
+                                   
                                     ))}
                                 </div>
                             )}

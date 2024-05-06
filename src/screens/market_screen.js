@@ -4,6 +4,11 @@ import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';  // This imports the necessary submodules
 
 const MarketScreen = () => {
+    const [isBookmarked, setIsBookmarked] = useState(false);
+
+    const handleBookmarkClick = () => {
+        setIsBookmarked(!isBookmarked); // Toggle the bookmark state
+    };
     const foodItems = Array.from({ length: 40 }, (_, index) => ({
         name: `Food Item ${index + 1}`,
         type: `Type ${index % 5 + 1}`,
@@ -81,9 +86,9 @@ const MarketScreen = () => {
                             <div className="flex-grow flex flex-col">
                                 {index === selectedIdx ? (
                                     <div>
-                                        <div className="flex items-center">
+                                        <div className="flex items-center" onClick={handleBookmarkClick}>
                                             <div className="mr-2">
-                                                <svg width="11" height="19" viewBox="0 0 11 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <svg width="11" height="19" viewBox="0 0 11 19" fill={isBookmarked ? "black" : "none"} xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M10 1.67604C10 0.774651 1 0.774654 1 1.67604V17L5.5 11.6667L10 17V1.67604Z" stroke="black" />
                                                 </svg>
                                             </div>
@@ -98,11 +103,10 @@ const MarketScreen = () => {
                                                         +{Math.floor(Math.random() * 100)}
                                                     </div>
                                                     <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" stroke-width="2" />
+                                                        <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" strokeWidth="2" />
                                                     </svg>
                                                     <div className="ml-0 text-green-800">
                                                         {Math.floor(Math.random() * 100)}%
-
                                                     </div>
                                                 </div>
                                             </div>
@@ -111,22 +115,26 @@ const MarketScreen = () => {
 
                                 ) : (
                                     <div>
-                                        <div className="text-md font-bold">{item.name}</div>
+                                        <div className="text-md font-black">{item.name}</div>
 
                                         <div className="text-xs">{item.type}</div>
                                         <div className="text-right -mt-10">
-                                            <div className="font-bold">{item.number}</div>
+                                            <div className="font-black text-green-800">{item.number}.00</div>
                                             <div className="text-xs flex items-center justify-end space-x-2 ml-2">
-                                                <div className="mr-0 text-green-800">
-                                                    +{Math.floor(Math.random() * 100)}.00
+                                                <div className="flex items-center">
+                                                    <div className="flex items-center space-x-1">
+                                                        <div className="font-black text-green-800">
+                                                            +{Math.floor(Math.random() * 100)}.00
+                                                        </div>
+                                                        <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" strokeWidth="2" />
+                                                        </svg>
+                                                        <div className="font-black text-green-800">
+                                                            +{Math.floor(Math.random() * 100)}.33%
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" stroke-width="2" />
-                                                </svg>
-                                                <div className="ml-0 text-green-800">
-                                                   +{Math.floor(Math.random() * 100)}%
 
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -138,9 +146,10 @@ const MarketScreen = () => {
                                 {index === selectedIdx && (
                                     <div className="flex items-center border border-red-800 rounded-md px-2 ml-4">
                                         <button className="focus:outline-none" onClick={(e) => handleCountChange(index, -1, e)}>➖</button>
-                                        <span className="mx-2">{counts[index]}</span>
+                                        <span className="mx-2" style={{ minWidth: "2rem", textAlign: "center" }}>{counts[index]}</span>
                                         <button className="focus:outline-none" onClick={(e) => handleCountChange(index, 1, e)}>➕</button>
                                     </div>
+
                                 )}
                             </div>
                         </div>
