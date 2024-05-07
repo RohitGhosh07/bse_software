@@ -3,7 +3,7 @@ import MainScreen from './screens/main_screen';
 import MenuScreen from './screens/menu_screen';
 import MarketScreen from './screens/market_screen';
 import CartScreen from './screens/cart_screen';
-import OrderScreen from './screens/oder_screen';
+import OrderScreen from './screens/orders_screen';
 
 function App() {
   return (

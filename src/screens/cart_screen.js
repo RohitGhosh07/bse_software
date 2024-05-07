@@ -19,7 +19,7 @@ const CartScreen = () => {
             setShowCheckmark(false); // Hide the checkmark animation after 2 seconds
             navigate('/orders'); // Navigate to the "another" screen on success.
 
-        }, 1400);
+        }, 2100);
     };
 
 
@@ -50,7 +50,7 @@ const CartScreen = () => {
             <div className="w-full fixed top-0 pt-2 bg-white z-50">
                 <div className="flex flex-col items-center">
                     <img src="https://i.ibb.co/gPPqZfg/bse-demo-logo.png" alt="Center Image" className="object-cover w-20 h-auto" />
-                    <h1 className="text-xl mt-4 mb-2  font-black">Card Items</h1>
+                    <h1 className="text-xl mt-4 mb-2  font-black">Cart Items</h1>
                 </div>
             </div>
 
@@ -78,9 +78,10 @@ const CartScreen = () => {
                     ))
                 ))}
                 <div style={{ height: '1px', backgroundColor: '#ccc', width: '100%', marginTop: '8px' }}></div>
-                <div className="flex justify-between items-center py-2 px-4 mt-1 bg-white">
-                    <span className="text-gray-800 text-xs font-medium">Add more items</span>
-                    <a href="/menu">
+                <a href="/menu">
+
+                    <div className="flex justify-between items-center py-2 px-4 mt-1 bg-white">
+                        <span className="text-gray-800 text-xs font-medium">Add more items</span>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -92,8 +93,9 @@ const CartScreen = () => {
                             <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
                         </svg>
-                    </a>
-                </div>
+
+                    </div>
+                </a>
                 <div style={{ height: '1px', backgroundColor: '#ccc', width: '100%', marginTop: '8px' }}></div>
                 <CountdownTimer />
                 <div className="flex flex-col items-center justify-center py-12">
