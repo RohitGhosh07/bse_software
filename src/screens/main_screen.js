@@ -6,13 +6,74 @@ const MainScreen = () => {
     const navigate = useNavigate();
     const { showSnackbar } = useSnackbar();
     const initialOtp = Array(6).fill('');
-
+    const [counter, setCounter] = useState(11); // Set the initial counter to 11 seconds
     const [isOtpMode, setIsOtpMode] = useState(false);
     const [otp, setOtp] = useState(new Array(6).fill(""));
+    const [id, setId] = useState(""); // Initialize id state with an empty string
     // const otpInputRefs = useRef(new Array(6).fill(null));
     const otpInputRefs = useRef([]);
+    const [phoneNumber, setPhoneNumber] = useState('');
 
-    const [counter, setCounter] = useState(11); // Set the initial counter to 11 seconds
+    const handleSubmit = () => {
+        fetch(process.env.REACT_APP_BACKEND_MAIN_URI + '/customers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name: "", phone: phoneNumber }),
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json(); // Parse the response body as JSON
+                } else {
+                    console.error('Failed to post phone number:', response.status);
+                    // Handle error, such as showing an error message
+                }
+            })
+            .then(data => {
+                setId(data.id);
+                console.log("the id is:", data.id); // Access the ID property from the parsed JSON data
+                setIsOtpMode(true);
+                setCounter(11); // Reset counter when moving to OTP mode
+                showSnackbar("OTP has been sent");
+            })
+            .catch(error => {
+                console.error('Error posting phone number:', error);
+                // Handle error, such as showing an error message
+            });
+
+    };
+    const handleVerifyOTP = () => {
+        // Concatenate the OTP digits into a single string
+        const enteredOTP = otp.join('');
+
+        // Replace 'idValue' with the actual ID value you want to send
+        const idValue = id; // Example ID value
+
+        fetch(process.env.REACT_APP_BACKEND_MAIN_URI + '/verify-otp', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: idValue, otp: enteredOTP }),
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Handle success response
+                    console.log('OTP verification successful');
+                    navigate('/menu'); // Navigate to the "another" screen on success
+
+                } else {
+                    // Handle error response
+                    console.error('OTP verification failed:', response.status);
+                }
+            })
+            .catch(error => {
+                // Handle network error
+                console.error('Error verifying OTP:', error);
+            });
+    };
+
     useEffect(() => {
         let interval = null;
         if (isOtpMode && counter > 0) {
@@ -158,8 +219,11 @@ const MainScreen = () => {
                             className="mt-8 px-10 py-2 border border-black rounded-md shadow-sm w-full max-w-md text-center"
                             maxLength="10"
                             pattern="\d*"
-                            onInput={e => e.target.value = e.target.value.slice(0, 10)} // Ensures the input is restricted to 10 digits
+                            value={phoneNumber}
+                            onChange={(e) => setPhoneNumber(e.target.value)}
+                            onInput={(e) => e.target.value = e.target.value.slice(0, 10)} // Ensures the input is restricted to 10 digits
                         />
+
 
                     ) : (
                         <div className="flex justify-center space-x-2 mt-8">
@@ -179,10 +243,12 @@ const MainScreen = () => {
 
                     <div className="px-12">
                         <button
-                            onClick={handleButtonClick}
-                            className="mt-4 bg-red-800 hover:bg-red-900 text-white font-bold py-2 px-12 rounded-xl w-full max-w-md">
+                            onClick={isOtpMode ? handleVerifyOTP : handleSubmit}
+                            className="mt-4 bg-red-800 hover:bg-red-900 text-white font-bold py-2 px-12 rounded-xl w-full max-w-md"
+                        >
                             {isOtpMode ? "Verify OTP" : "Get Started"}
                         </button>
+
                         {isOtpMode && counter > 0 && (
                             <p className="mt-2 text-sm flex justify-center text-gray-500">
                                 Resend OTP in {counter} sec
