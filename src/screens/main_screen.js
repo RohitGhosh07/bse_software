@@ -66,6 +66,8 @@ const MainScreen = () => {
                 } else {
                     // Handle error response
                     console.error('OTP verification failed:', response.status);
+                    showSnackbar("Invalid OTP");
+
                 }
             })
             .catch(error => {
@@ -109,18 +111,18 @@ const MainScreen = () => {
         }
     }, []);
 
-    const handleButtonClick = () => {
-        if (!isOtpMode) {
-            setIsOtpMode(true);
-            setCounter(11); // Reset counter when moving to OTP mode
-            showSnackbar("OTP has been sent");
+    // const handleButtonClick = () => {
+    //     if (!isOtpMode) {
+    //         setIsOtpMode(true);
+    //         setCounter(11); // Reset counter when moving to OTP mode
+    //         showSnackbar("OTP has been sent");
 
-        } else {
-            navigate('/menu'); // Navigate to the "another" screen on success
-            // showSnackbar("Happy TRADING!!");
+    //     } else {
+    //         navigate('/menu'); // Navigate to the "another" screen on success
+    //         // showSnackbar("Happy TRADING!!");
 
-        }
-    };
+    //     }
+    // };
 
     const resendOtp = () => {
         console.log("Resend OTP clicked"); // Implement resend OTP functionality
