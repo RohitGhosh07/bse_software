@@ -24,12 +24,12 @@ const MarketScreen = () => {
         }
     };
 
-
     const handleSearch = (e) => {
         const query = e.target.value;
         setSearchQuery(query);
         fetchItems(query);
     };
+
     useEffect(() => {
         const fetchBookmarkItemId = async () => {
             try {
@@ -55,8 +55,6 @@ const MarketScreen = () => {
 
         fetchBookmarkItemId();
     }, []);
-
-
 
     const handleBookmarkDelete = async (itemId) => {
         const phoneNumber = localStorage.getItem('phone');
@@ -104,7 +102,6 @@ const MarketScreen = () => {
         ]
     });
 
-
     const [selectedIdx, setSelectedIdx] = useState(null);
     const [counts, setCounts] = useState(new Array(40).fill(0));
 
@@ -133,6 +130,7 @@ const MarketScreen = () => {
         // Update state with the new counts
         setCounts(newCount);
     };
+
     const handleItemClick = async (itemId) => {
         const phoneNumber = localStorage.getItem('phone');
         console.log('Phone number:', phoneNumber);
@@ -175,6 +173,7 @@ const MarketScreen = () => {
             alert('Failed to bookmark item');
         }
     };
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -187,6 +186,7 @@ const MarketScreen = () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
+
     const toggleDropdown = () => {
         setDropdownVisible(!dropdownVisible);
     };
@@ -209,30 +209,27 @@ const MarketScreen = () => {
                         className="w-full p-2 border border-gray-300 rounded-md shadow-md"
                     />
                     {dropdownVisible && (
-                       <div className="relative">
-                       {searchResults.length > 0 && (
-                           <div className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-300 rounded-md shadow-md max-h-48 overflow-y-auto">
-                               {searchResults.map((item, index) => (
-                                   <div
-                                       key={index}
-                                       className="border-b border-gray-300 p-2 cursor-pointer"
-                                       onClick={() => {
-                                        handleItemClick(item.item_id);
-                                        toggleDropdown();
-                                    }}
-                                    
-                                   >
-                                       <p>{item.item_name}</p>
-                                       {/* Add more item details here if needed */}
-                                   </div>
-                               ))}
-                           </div>
-                       )}
-                   </div>
-                   
+                        <div className="relative">
+                            {searchResults.length > 0 && (
+                                <div className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-300 rounded-md shadow-md max-h-48 overflow-y-auto">
+                                    {searchResults.map((item, index) => (
+                                        <div
+                                            key={index}
+                                            className="border-b border-gray-300 p-2 cursor-pointer"
+                                            onClick={() => {
+                                                handleItemClick(item.item_id);
+                                                toggleDropdown();
+                                            }}
+                                        >
+                                            <p>{item.item_name}</p>
+                                            {/* Add more item details here if needed */}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     )}
                 </div>
-
             </div>
             <div className="pt-40 mt-8 pb-20 w-full overflow-auto">
                 {items.map((itemData, index) => (
@@ -284,8 +281,6 @@ const MarketScreen = () => {
                                             </div>
                                         </div>
                                     </div>
-
-
                                 ) : (
                                     <div>
                                         <div className="text-md font-black">{itemData.items[0].item_name}</div>
@@ -307,25 +302,21 @@ const MarketScreen = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-
                                             </div>
                                         </div>
                                     </div>
-
-
                                 ))}
                             </div>
                             <div className="flex items-center">
                                 {index === selectedIdx && (
-                                    <div className="flex items-center border border-red-800 rounded-md px-2 ml-4">
-                                        <button className="focus:outline-none" onClick={(e) => handleCountChange(index, -1)}>➖</button>
+                                    <div className="flex items-center border border-red-800 rounded-md px-2 ml-4" onClick={(e) => e.stopPropagation()}>
+                                        <button className="focus:outline-none" onClick={(e) => handleCountChange(itemData.items[0].item_id, -1)}>➖</button>
                                         <span className="mx-2" style={{ minWidth: "2rem", textAlign: "center" }}>
                                             {/* Retrieve count from local storage if available, otherwise display 0 */}
-                                            {localStorage.getItem(`item_${index.item_id}_count`) ? JSON.parse(localStorage.getItem(`item_${index.item_id}_count`)).count : 0}
+                                            {localStorage.getItem(`item_${itemData.items[0].item_id}_count`) ? JSON.parse(localStorage.getItem(`item_${itemData.items[0].item_id}_count`)).count : 0}
                                         </span>
-                                        <button className="focus:outline-none" onClick={(e) => handleCountChange(index, 1)}>➕</button>
+                                        <button className="focus:outline-none" onClick={(e) => handleCountChange(itemData.items[0].item_id, 1)}>➕</button>
                                     </div>
-
                                 )}
                             </div>
                         </div>
@@ -335,7 +326,6 @@ const MarketScreen = () => {
                                 <Line data={randomData()} options={{ responsive: true, maintainAspectRatio: false }} />
                             </div>
                         )}
-
                     </React.Fragment>
                 ))}
             </div>
