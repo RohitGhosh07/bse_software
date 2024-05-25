@@ -13,44 +13,54 @@ const MainScreen = () => {
     // const otpInputRefs = useRef(new Array(6).fill(null));
     const otpInputRefs = useRef([]);
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = () => {
-        fetch(process.env.REACT_APP_BACKEND_MAIN_URI + '/customers', {
+        setIsLoading(true);
+
+        fetch(`${process.env.REACT_APP_BACKEND_MAIN_URI}/customers`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ name: "", phone: phoneNumber }),
+            body: JSON.stringify({ name: '', phone: phoneNumber }),
         })
             .then(response => {
                 if (response.ok) {
-                    return response.json(); // Parse the response body as JSON
+                    return response.json();
                 } else {
                     console.error('Failed to post phone number:', response.status);
                     // Handle error, such as showing an error message
                 }
             })
             .then(data => {
-                setId(data.id);
-                console.log("the id is:", data.id); // Access the ID property from the parsed JSON data
-                setIsOtpMode(true);
-                setCounter(11); // Reset counter when moving to OTP mode
-                showSnackbar("OTP has been sent");
+                if (data) {
+                    localStorage.setItem('phone', phoneNumber);
+                    localStorage.setItem('customer_id', data.id);
+
+                    setId(data.id);
+                    console.log('the id is:', data.id);
+                    setIsOtpMode(true);
+                    setCounter(11); // Reset counter when moving to OTP mode
+                    showSnackbar('OTP has been sent');
+                }
             })
             .catch(error => {
                 console.error('Error posting phone number:', error);
                 // Handle error, such as showing an error message
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
-
     };
+
     const handleVerifyOTP = () => {
-        // Concatenate the OTP digits into a single string
+        setIsLoading(true);
+
         const enteredOTP = otp.join('');
+        const idValue = id;
 
-        // Replace 'idValue' with the actual ID value you want to send
-        const idValue = id; // Example ID value
-
-        fetch(process.env.REACT_APP_BACKEND_MAIN_URI + '/verify-otp', {
+        fetch(`${process.env.REACT_APP_BACKEND_MAIN_URI}/verify-otp`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -59,20 +69,18 @@ const MainScreen = () => {
         })
             .then(response => {
                 if (response.ok) {
-                    // Handle success response
                     console.log('OTP verification successful');
                     navigate('/menu'); // Navigate to the "another" screen on success
-
                 } else {
-                    // Handle error response
                     console.error('OTP verification failed:', response.status);
-                    showSnackbar("Invalid OTP");
-
+                    showSnackbar('Invalid OTP');
                 }
             })
             .catch(error => {
-                // Handle network error
                 console.error('Error verifying OTP:', error);
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
     };
 
@@ -150,11 +158,11 @@ const MainScreen = () => {
                                     </span>
                                     {index % 2 === 0
                                         ? <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" stroke-width="2" />
+                                            <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" strokeWidth="2" />
                                         </svg>
 
                                         : <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M9.5 12.5L2 1H17L9.5 12.5Z" fill="#D82222" stroke="#D82222" stroke-width="2" />
+                                            <path d="M9.5 12.5L2 1H17L9.5 12.5Z" fill="#D82222" stroke="#D82222" strokeWidth="2" />
                                         </svg>
                                     }
                                     {/* Vertical bar separator */}
@@ -185,11 +193,11 @@ const MainScreen = () => {
                                     </span>
                                     {index % 2 === 0
                                         ? <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" stroke-width="2" />
+                                            <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" strokeWidth="2" />
                                         </svg>
 
                                         : <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M9.5 12.5L2 1H17L9.5 12.5Z" fill="#D82222" stroke="#D82222" stroke-width="2" />
+                                            <path d="M9.5 12.5L2 1H17L9.5 12.5Z" fill="#D82222" stroke="#D82222" strokeWidth="2" />
                                         </svg>
                                     }
                                     {/* Vertical bar separator */}
@@ -248,7 +256,16 @@ const MainScreen = () => {
                             onClick={isOtpMode ? handleVerifyOTP : handleSubmit}
                             className="mt-4 bg-red-800 hover:bg-red-900 text-white font-bold py-2 px-12 rounded-xl w-full max-w-md"
                         >
-                            {isOtpMode ? "Verify OTP" : "Get Started"}
+                            {isLoading ? (
+                                <div className="flex justify-center items-center">
+                                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                    </svg>
+                                </div>
+                            ) : (
+                                isOtpMode ? 'Verify OTP' : 'Get Started'
+                            )}
                         </button>
 
                         {isOtpMode && counter > 0 && (
@@ -257,7 +274,7 @@ const MainScreen = () => {
                             </p>
                         )}
                         {isOtpMode && counter === 0 && (
-                            <div className="flex justify-center text-sm"> <button onClick={resendOtp} className="flex justify-center mt-2 text-sm underline text-blue-500">
+                            <div className="flex justify-center text-sm"> <button onClick={handleSubmit} className="flex justify-center mt-2 text-sm underline text-blue-500">
                                 Resend
                             </button>
                                 <span className="text-sm py-2">

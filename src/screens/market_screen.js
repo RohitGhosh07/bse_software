@@ -1,19 +1,97 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import BottomNavbar from '../components/bottomNavbar';
 import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';  // This imports the necessary submodules
+import { useSnackbar } from '../components/Snackbar ';
 
 const MarketScreen = () => {
-    const [isBookmarked, setIsBookmarked] = useState(false);
+    // const [isBookmarked, setIsBookmarked] = useState(false);
+    const [items, setItems] = useState([]); // Initialize items state as an array
+    const [loading, setLoading] = useState(true); // State to track loading status
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [dropdownVisible, setDropdownVisible] = useState(false);
+    const { showSnackbar } = useSnackbar();
+    const dropdownRef = useRef(null);
 
-    const handleBookmarkClick = () => {
-        setIsBookmarked(!isBookmarked); // Toggle the bookmark state
+    const fetchItems = async (query) => {
+        try {
+            const response = await fetch(`http://localhost:5000/items?search=${query}`);
+            const data = await response.json();
+            setSearchResults(data.items);
+        } catch (error) {
+            console.error('Error fetching items:', error);
+        }
     };
-    const foodItems = Array.from({ length: 40 }, (_, index) => ({
-        name: `Food Item ${index + 1}`,
-        type: `Type ${index % 5 + 1}`,
-        number: Math.floor(Math.random() * 900 + 100)  // Random 3-digit number
-    }));
+
+
+    const handleSearch = (e) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+        fetchItems(query);
+    };
+    useEffect(() => {
+        const fetchBookmarkItemId = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/bookmarks?phone=9330262571');
+                const data = await response.json();
+                console.log(JSON.stringify(data.bookmarked_items));
+
+                const bookmarkedItemIds = data.bookmarked_items;
+                const itemDetailsPromises = bookmarkedItemIds.map(async (itemId) => {
+                    const itemResponse = await fetch(`http://localhost:5000/items?item_id=${itemId}`);
+                    const itemData = await itemResponse.json();
+                    console.log(itemData.items[0].item_name);
+                    return itemData;
+                });
+                const itemDetails = await Promise.all(itemDetailsPromises);
+                setItems(itemDetails);
+                setLoading(false);
+            } catch (error) {
+                console.error('Error fetching bookmarked item IDs:', error);
+                setLoading(false);
+            }
+        };
+
+        fetchBookmarkItemId();
+    }, []);
+
+
+
+    const handleBookmarkDelete = async (itemId) => {
+        const phoneNumber = localStorage.getItem('phone');
+
+        if (!phoneNumber) {
+            alert('Phone number not found in local storage');
+            return;
+        }
+        const requestBody = {
+            items_to_delete: [itemId], // Wrap the itemId in an array
+            phone: phoneNumber, // This will be sent as a string
+        };
+
+        try {
+            const response = await fetch('http://localhost:5000/bookmarks', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+            console.log('Bookmark deleted:', data);
+            showSnackbar("Bookmark deleted");
+        } catch (error) {
+            console.error('Error deleting bookmark:', error);
+            alert('Failed to delete bookmark');
+        }
+    };
+
     const randomData = () => ({
         labels: Array.from({ length: 7 }, (_, i) => `Point ${i + 1}`),
         datasets: [
@@ -30,26 +108,88 @@ const MarketScreen = () => {
     const [selectedIdx, setSelectedIdx] = useState(null);
     const [counts, setCounts] = useState(new Array(40).fill(0));
 
-    const handleCountChange = (index, change, e) => {
-        e.stopPropagation();
-        const newCounts = [...counts];
-        newCounts[index] += change;
-        if (newCounts[index] < 0) newCounts[index] = 0;
-        setCounts(newCounts);
+    const handleCountChange = (itemId, delta) => {
+        console.log('Called at market');
+
+        // Retrieve the current counts from local storage
+        const storedItemData = localStorage.getItem(`item_${itemId}_count`);
+        const currentCount = storedItemData ? JSON.parse(storedItemData).count : 0;
+        console.log(`Current count for item with ID ${itemId}:`, currentCount);
+
+        // Calculate the new count after applying the delta
+        const newCount = Math.max(0, currentCount + delta);
+        console.log(`New count for item with ID ${itemId}:`, newCount);
+
+        // Store the new count in local storage
+        const newItemData = {
+            id: itemId,
+            count: newCount,
+        };
+        localStorage.setItem(`item_${itemId}_count`, JSON.stringify(newItemData));
+
+        // Print the updated count
+        console.log(`Updated count for item with ID ${itemId}:`, newCount);
+
+        // Update state with the new counts
+        setCounts(newCount);
+    };
+    const handleItemClick = async (itemId) => {
+        const phoneNumber = localStorage.getItem('phone');
+        console.log('Phone number:', phoneNumber);
+        console.log('Item ID:', itemId);
+
+        if (!phoneNumber) {
+            alert('Phone number not found in local storage');
+            return;
+        }
+
+        const requestBody = {
+            bookmarked_items: [itemId], // Wrap the itemId in an array
+            phone: phoneNumber, // This will be sent as a string
+        };
+
+        console.log('Request body:', requestBody);
+
+        try {
+            const response = await fetch('http://localhost:5000/bookmarks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+            console.log('Response:', data);
+            showSnackbar("Bookmarked");
+
+            // Close the dropdown after successfully bookmarking
+            console.log('Dropdown closed');
+            setSelectedIdx(null);
+        } catch (error) {
+            console.error('Error bookmarking item:', error);
+            alert('Failed to bookmark item');
+        }
     };
     useEffect(() => {
-        const closeDropdown = (e) => {
-            setSelectedIdx(null);
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setDropdownVisible(false);
+            }
         };
 
-        // Attach the event listener
-        window.addEventListener('click', closeDropdown);
-
-        // Clean up the event listener
+        document.addEventListener('mousedown', handleClickOutside);
         return () => {
-            window.removeEventListener('click', closeDropdown);
+            document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [selectedIdx]); // Effect runs only when selectedIdx changes
+    }, []);
+    const toggleDropdown = () => {
+        setDropdownVisible(!dropdownVisible);
+    };
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
@@ -58,16 +198,44 @@ const MarketScreen = () => {
                     <img src="https://i.ibb.co/gPPqZfg/bse-demo-logo.png" alt="Center Image" className="object-cover w-20 h-auto" />
                     <h1 className="text-xl mt-4 font-black">Items</h1>
                 </div>
-                <div className="mt-4 mb-0 w-full px-4">
+                <div className="mt-4 mb-0 w-full px-4 relative">
                     <input
                         type="text"
                         placeholder="Search items..."
+                        value={searchQuery}
+                        onChange={handleSearch}
+                        onFocus={toggleDropdown}
+
                         className="w-full p-2 border border-gray-300 rounded-md shadow-md"
                     />
+                    {dropdownVisible && (
+                       <div className="relative">
+                       {searchResults.length > 0 && (
+                           <div className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-300 rounded-md shadow-md max-h-48 overflow-y-auto">
+                               {searchResults.map((item, index) => (
+                                   <div
+                                       key={index}
+                                       className="border-b border-gray-300 p-2 cursor-pointer"
+                                       onClick={() => {
+                                        handleItemClick(item.item_id);
+                                        toggleDropdown();
+                                    }}
+                                    
+                                   >
+                                       <p>{item.item_name}</p>
+                                       {/* Add more item details here if needed */}
+                                   </div>
+                               ))}
+                           </div>
+                       )}
+                   </div>
+                   
+                    )}
                 </div>
+
             </div>
             <div className="pt-40 mt-8 pb-20 w-full overflow-auto">
-                {foodItems.map((item, index) => (
+                {items.map((itemData, index) => (
                     <React.Fragment key={index}>
                         <div
                             className={`flex justify-between items-center px-4 py-2 cursor-pointer ${index === selectedIdx ? 'bg-slate-200 text-black h-16' : 'border-b border-gray-200 text-gray-800 h-12'} ${selectedIdx !== null && index !== selectedIdx ? 'opacity-50' : ''}`}
@@ -84,20 +252,24 @@ const MarketScreen = () => {
                             }}
                         >
                             <div className="flex-grow flex flex-col">
-                                {index === selectedIdx ? (
+                                {loading ? (
+                                    <div className="grid min-h-[140px] w-full place-items-center overflow-x-scroll rounded-lg p-6 lg:overflow-visible">
+                                        <img src="https://i.pinimg.com/originals/c4/cb/9a/c4cb9abc7c69713e7e816e6a624ce7f8.gif" alt="Loading" className="object-cover w-20 h-auto" />
+                                    </div>
+                                ) : (index === selectedIdx ? (
                                     <div>
-                                        <div className="flex items-center" onClick={handleBookmarkClick}>
+                                        <div className="flex items-center" onClick={() => handleBookmarkDelete(itemData.items[0].item_id)}>
                                             <div className="mr-2">
-                                                <svg width="11" height="19" viewBox="0 0 11 19" fill={isBookmarked ? "black" : "none"} xmlns="http://www.w3.org/2000/svg">
+                                                <svg width="11" height="19" viewBox="0 0 11 19" fill={"black"} xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M10 1.67604C10 0.774651 1 0.774654 1 1.67604V17L5.5 11.6667L10 17V1.67604Z" stroke="black" />
                                                 </svg>
                                             </div>
-                                            <div className="text-xl font-black">{item.name}</div>
+                                            <div className="text-xl font-black">{itemData.items[0].item_name}</div>
                                         </div>
                                         <div className="flex justify-start items-center w-full">
-                                            <div className="text-xs">{item.type}</div>
+                                            <div className="text-xs">{items.type}</div>
                                             <div className="flex px-2">
-                                                <div className="text-xs font-bold">{item.number}.00</div>
+                                                <div className="text-xs font-bold">{items.number}.00</div>
                                                 <div className="text-xs flex items-center justify-end space-x-2 ml-2">
                                                     <div className="mr-0 text-green-800">
                                                         +{Math.floor(Math.random() * 100)}
@@ -113,13 +285,14 @@ const MarketScreen = () => {
                                         </div>
                                     </div>
 
+
                                 ) : (
                                     <div>
-                                        <div className="text-md font-black">{item.name}</div>
+                                        <div className="text-md font-black">{itemData.items[0].item_name}</div>
 
-                                        <div className="text-xs">{item.type}</div>
+                                        <div className="text-xs">{itemData.items[0].item_name}</div>
                                         <div className="text-right -mt-10">
-                                            <div className="font-black text-green-800">{item.number}.00</div>
+                                            <div className="font-black text-green-800">{itemData.items[0].base_price}.00</div>
                                             <div className="text-xs flex items-center justify-end space-x-2 ml-2">
                                                 <div className="flex items-center">
                                                     <div className="flex items-center space-x-1">
@@ -140,14 +313,17 @@ const MarketScreen = () => {
                                     </div>
 
 
-                                )}
+                                ))}
                             </div>
                             <div className="flex items-center">
                                 {index === selectedIdx && (
                                     <div className="flex items-center border border-red-800 rounded-md px-2 ml-4">
-                                        <button className="focus:outline-none" onClick={(e) => handleCountChange(index, -1, e)}>➖</button>
-                                        <span className="mx-2" style={{ minWidth: "2rem", textAlign: "center" }}>{counts[index]}</span>
-                                        <button className="focus:outline-none" onClick={(e) => handleCountChange(index, 1, e)}>➕</button>
+                                        <button className="focus:outline-none" onClick={(e) => handleCountChange(index, -1)}>➖</button>
+                                        <span className="mx-2" style={{ minWidth: "2rem", textAlign: "center" }}>
+                                            {/* Retrieve count from local storage if available, otherwise display 0 */}
+                                            {localStorage.getItem(`item_${index.item_id}_count`) ? JSON.parse(localStorage.getItem(`item_${index.item_id}_count`)).count : 0}
+                                        </span>
+                                        <button className="focus:outline-none" onClick={(e) => handleCountChange(index, 1)}>➕</button>
                                     </div>
 
                                 )}

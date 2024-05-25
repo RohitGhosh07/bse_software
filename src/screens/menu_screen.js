@@ -55,11 +55,11 @@
 //                                     </span>
 //                                     {index % 2 === 0
 //                                         ? <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-//                                             <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" stroke-width="2" />
+//                                             <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" strokeWidth="2" />
 //                                         </svg>
 
 //                                         : <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-//                                             <path d="M9.5 12.5L2 1H17L9.5 12.5Z" fill="#D82222" stroke="#D82222" stroke-width="2" />
+//                                             <path d="M9.5 12.5L2 1H17L9.5 12.5Z" fill="#D82222" stroke="#D82222" strokeWidth="2" />
 //                                         </svg>
 
 //                                     }
@@ -151,10 +151,14 @@ import BottomNavbar from '../components/bottomNavbar';
 const MenuScreen = () => {
     const [categories, setCategories] = useState(null);
     const [openDropdown, setOpenDropdown] = useState(null);
-    const [counts, setCounts] = useState({});
     const [items, setItems] = useState({});
+    const [counts, setCounts] = useState({});
+    const [loading, setLoading] = useState(true); // State to track loading status
+
 
     useEffect(() => {
+        setLoading(true); // Set loading to true before fetching data
+
         // Fetch categories from the API
         fetch(process.env.REACT_APP_BACKEND_MAIN_URI + '/categories')
             .then(response => {
@@ -165,16 +169,24 @@ const MenuScreen = () => {
             })
             .then(data => {
                 setCategories(data.categories);
+
                 // Initialize item counts for each category
                 const initialCounts = {};
                 data.categories.forEach(category => {
                     initialCounts[category.item_category_name] = Array(category.active_slot_end - category.active_slot_start + 1).fill(0);
-                    // Fetch items for each category
-                    fetchItemsByCategory(category.id);
                 });
                 setCounts(initialCounts);
+
+                // Fetch items for each category
+                data.categories.forEach(category => {
+                    fetchItemsByCategory(category.id);
+                });
+                setLoading(false); // Set loading to false after data is fetched
+
             })
             .catch(error => {
+                setLoading(false); // Set loading to false after data is fetched
+
                 console.error('Error fetching categories:', error);
             });
     }, []);
@@ -184,16 +196,90 @@ const MenuScreen = () => {
         setOpenDropdown(openDropdown === category ? null : category);
     };
 
+    // // Handle count change for each category
+    // const handleCountChange = (category, index, delta) => {
+    //     setCounts(prevCounts => {
+    //         // Make a copy of the previous counts
+    //         const newCounts = { ...prevCounts };
+
+    //         // Retrieve the current count from the previous counts
+    //         const currentCount = newCounts[category][index];
+
+    //         // Calculate the new count after applying the delta
+    //         const newCount = Math.max(0, isNaN(currentCount) ? 0 : currentCount + delta);
+
+    //         // Update the counts for the specified category and index
+    //         newCounts[category][index] = newCount;
+    //         fetch(process.env.REACT_APP_BACKEND_MAIN_URI + '/store_count', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify({
+    //                 item_id: index,
+    //                 count: newCount,
+    //             }),
+    //         })
+    //         .then(response => {
+    //             if (!response.ok) {
+    //                 throw new Error('Failed to store count');
+    //             }
+    //             console.log(`Count for item ${index} updated successfully.`);
+    //         })
+    //         .catch(error => {
+    //             console.error('Error storing count:', error);
+    //         });
+    //         // Print the new count
+    //         console.log(`New count for ${category} at index ${index}:`, newCount);
+
+    //         // Return the updated counts
+    //         return newCounts;
+    //     });
+    // };
     // Handle count change for each category
-    const handleCountChange = (category, index, delta) => {
+    // Handle count change for each category
+    const handleCountChange = (category, item, delta) => {
+        console.log('Called at menu');
+
+        // Make a copy of the current counts
         const newCounts = { ...counts };
-        newCounts[category][index] = Math.max(0, newCounts[category][index] + delta);
+        const storedItemData = localStorage.getItem(`item_${item}_count`);
+
+        // Retrieve the current count from the previous counts
+        const currentCount = storedItemData ? JSON.parse(storedItemData).count : (newCounts[category] && newCounts[category][item]) || 0;
+        console.log(`Current count for ${category} with ID ${item}:`, currentCount);
+
+        // Calculate the new count after applying the delta
+        const newCount = Math.max(0, isNaN(currentCount) ? 0 : currentCount + delta);
+        console.log(`New count for ${category} with ID ${item}:`, newCount);
+
+        // Update the counts for the specified category and item ID
+        if (!newCounts[category]) {
+            newCounts[category] = {};
+        }
+        newCounts[category][item] = newCount;
+
+        // Store item ID and count in local storage
+        const localStorageKey = `item_${item}_count`;
+        const itemData = {
+            id: item,
+            count: newCount,
+        };
+        localStorage.setItem(localStorageKey, JSON.stringify(itemData));
+
+        // Print the new count
+        console.log(`Updated count for ${category} with ID ${item}:`, newCount);
+
+        // Update state with the new counts
         setCounts(newCounts);
     };
 
+
+
+
     // Fetch items for a specific category
     const fetchItemsByCategory = (categoryId) => {
-        fetch(`http://localhost:5000/items?item_category_id=${categoryId}`)
+        fetch(process.env.REACT_APP_BACKEND_MAIN_URI + `/items?item_category_id=${categoryId}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to fetch items');
@@ -201,7 +287,7 @@ const MenuScreen = () => {
                 return response.json();
             })
             .then(data => {
-                console.log(`Items for category ${categoryId}:`, data);
+                // console.log(`Items for category ${categoryId}:`, data);
                 setItems(prevItems => ({
                     ...prevItems,
                     [categoryId]: data.items // Store items in state using category ID as key
@@ -234,10 +320,10 @@ const MenuScreen = () => {
                                     </span>
                                     {index % 2 === 0
                                         ? <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" stroke-width="2" />
+                                            <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" strokeWidth="2" />
                                         </svg>
                                         : <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M9.5 12.5L2 1H17L9.5 12.5Z" fill="#D82222" stroke="#D82222" stroke-width="2" />
+                                            <path d="M9.5 12.5L2 1H17L9.5 12.5Z" fill="#D82222" stroke="#D82222" strokeWidth="2" />
                                         </svg>
                                     }
                                     {/* Vertical bar separator */}
@@ -251,8 +337,12 @@ const MenuScreen = () => {
                         </div>
                     </div>
                     <h1 className="text-xl mt-4 mb-2 first-line:font-black">Menu Items</h1>
-                    {/* Render categories and items */}
-                    {categories && categories.map(category => (
+
+                    {loading ? (
+                        <div className="grid min-h-[140px] w-full place-items-center overflow-x-scroll rounded-lg p-6 lg:overflow-visible">
+                            <img src="https://i.pinimg.com/originals/c4/cb/9a/c4cb9abc7c69713e7e816e6a624ce7f8.gif" alt="Loading" className="object-cover w-20 h-auto" />
+                        </div>
+                    ) : (categories && categories.map(category => (
                         <div key={category.id} className="w-full mt-2">
                             <div className="w-full h-8 bg-gray-200 font-black flex justify-start items-center px-2 cursor-pointer" onClick={() => toggleDropdown(category.item_category_name)}>
                                 {category.item_category_name.charAt(0).toUpperCase() + category.item_category_name.slice(1)} Items
@@ -265,34 +355,42 @@ const MenuScreen = () => {
                                     {/* Render items dynamically */}
                                     {items[category.id] && items[category.id].map((item, index) => (
                                         <div>
-                                            <div key={index} className="flex justify-between items-center p-2 hover:bg-slate-100">
-                                                <div>
-                                                    <div className="text-md font-medium">{item.item_name}</div>
-                                                    <div className="flex items-center">
-                                                        <div className="text-green-800 mr-1">{item.upper_circuit}</div>
-                                                        <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" strokeWidth="2" />
-                                                        </svg>
-                                                        <div className="ml-1 text-green-800">{item.lower_circuit}</div>
-                                                    </div>
-                                                </div>
+                                        <div key={index} className="flex justify-between items-center p-2 hover:bg-slate-100">
+                                            <div>
+                                                <div className="text-md font-medium">{item.item_name}</div>
                                                 <div className="flex items-center">
-                                                    <div className="flex justify-end items-center border border-red-800 rounded-md px-2">
-                                                        <button className="focus:outline-none" onClick={() => handleCountChange(category.item_category_name, index, -1)}>➖</button>
-                                                        <span className="mx-2" style={{ minWidth: "2rem", textAlign: "center" }}>{counts[category.item_category_name][index]}</span>
-                                                        <button className="focus:outline-none" onClick={() => handleCountChange(category.item_category_name, index, 1)}>➕</button>
-                                                    </div>
-                                                    <div style={{ height: "1px", backgroundColor: "rgba(0, 0, 0, 0.12)", width: "20px" }} />
+                                                    <div className="text-green-800 mr-1">{item.upper_circuit}</div>
+                                                    <svg width="19" height="15" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M9.5 2L2 13.5H17L9.5 2Z" fill="#116228" stroke="#116228" strokeWidth="2" />
+                                                    </svg>
+                                                    <div className="ml-1 text-green-800">{item.lower_circuit}</div>
                                                 </div>
                                             </div>
-                                            <div style={{ height: '1px', backgroundColor: '#ccc', width: '100%', marginTop: '0px' }}></div>
+                                            <div className="flex items-center">
+                                                <div className="flex justify-end items-center border border-red-800 rounded-md px-2">
+                                                    <button className="focus:outline-none" onClick={() => { handleCountChange(category.item_category_name, item.item_id, -1) }}>➖</button>
+                                                    {/* Display count according to local storage or show 0 */}
+                                                    <span className="mx-2" style={{ minWidth: "2rem", textAlign: "center" }}>
+                                                        {/* Retrieve count from local storage if available, otherwise display 0 */}
+                                                        {localStorage.getItem(`item_${item.item_id}_count`) ? JSON.parse(localStorage.getItem(`item_${item.item_id}_count`)).count : 0}
+                                                    </span>
+                                                    <button className="focus:outline-none" onClick={() => handleCountChange(category.item_category_name, item.item_id, 1)}>➕</button>
+                                                </div>
+                                            </div>
+
+
+
+                                        </div>
+                                        <div style={{ height: '1px', backgroundColor: '#ccc', width: '100%', marginTop: '0px' }}></div>
 
                                         </div>
                                     ))}
 
+
+
                                 </div>
                             )}
-                        </div>
+                        </div>)
                     ))}
                     <div className="mb-32">
 
