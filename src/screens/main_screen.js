@@ -14,6 +14,8 @@ const MainScreen = () => {
     const otpInputRefs = useRef([]);
     const [phoneNumber, setPhoneNumber] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [loginMode, setLoginMode] = useState(''); // '' for no selection, 'member' or 'guest'
+    const [userName, setUserName] = useState('');
 
     const handleSubmit = () => {
         setIsLoading(true);
@@ -23,7 +25,7 @@ const MainScreen = () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ name: '', phone: phoneNumber }),
+            body: JSON.stringify({ name: userName, phone: phoneNumber }),
         })
             .then(response => {
                 if (response.ok) {
@@ -214,7 +216,6 @@ const MainScreen = () => {
                 </div>
             </div>
 
-            {/* Center content with padding top to account for fixed header */}
             <div className="flex flex-col items-center justify-center w-full pt-0">
                 {/* Image in the center with fixed square size */}
                 <img src="/assets/icons/restraurenticon.svg"
@@ -222,70 +223,101 @@ const MainScreen = () => {
                     className="mt-0 w-179 h-135 object-cover" />
 
                 <div className="px-10">
-                    {!isOtpMode ? (
-                        <input
-                            type="number"
-                            placeholder="Phone number"
-                            className="mt-8 px-10 py-2 border border-black rounded-md shadow-sm w-full max-w-md text-center"
-                            maxLength="10"
-                            pattern="\d*"
-                            value={phoneNumber}
-                            onChange={(e) => setPhoneNumber(e.target.value)}
-                            onInput={(e) => e.target.value = e.target.value.slice(0, 10)} // Ensures the input is restricted to 10 digits
-                        />
-
-
-                    ) : (
-                        <div className="flex justify-center space-x-2 mt-8">
-                            {otp.map((digit, index) => (
-                                <input
-                                    key={index}
-                                    type="text"
-                                    className="w-10 h-10 text-center text-xl border border-black rounded-md"
-                                    maxLength="1"
-                                    value={digit}
-                                    onChange={e => handleOtpChange(e.target, index)}
-                                    ref={el => otpInputRefs.current[index] = el}
-                                />
-                            ))}
-                        </div>
-                    )}
-
-                    <div className="px-12">
-                        <button
-                            onClick={isOtpMode ? handleVerifyOTP : handleSubmit}
-                            className="mt-4 bg-red-800 hover:bg-red-900 text-white font-bold py-2 px-12 rounded-xl w-full max-w-md"
-                        >
-                            {isLoading ? (
-                                <div className="flex justify-center items-center">
-                                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                                    </svg>
-                                </div>
-                            ) : (
-                                isOtpMode ? 'Verify OTP' : 'Get Started'
-                            )}
-                        </button>
-
-                        {isOtpMode && counter > 0 && (
-                            <p className="mt-2 text-sm flex justify-center text-gray-500">
-                                Resend OTP in {counter} sec
-                            </p>
-                        )}
-                        {isOtpMode && counter === 0 && (
-                            <div className="flex justify-center text-sm"> <button onClick={handleSubmit} className="flex justify-center mt-2 text-sm underline text-blue-500">
-                                Resend
-                            </button>
-                                <span className="text-sm py-2">
-                                    &nbsp;the OTP
-                                </span>
+                    {loginMode === '' ? (
+                        <div className="mt-10">
+                            <div className="flex flex-col space-y-4">
+                                <button
+                                    onClick={() => setLoginMode('member')}
+                                    className="bg-red-800 hover:bg-red-900 text-white font-bold py-2 px-12 rounded-xl w-full max-w-md border-2 border-red-800 "
+                                >
+                                    Member Login
+                                </button>
+                                <button
+                                    onClick={() => setLoginMode('guest')}
+                                    className="bg-white hover:bg-red-200 text-black font-bold py-2 px-12 rounded-xl w-full max-w-md border-2 border-red-800 "
+                                >
+                                    Guest Login
+                                </button>
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    ) : (
+                        <>
+                            {loginMode === 'guest' && !isOtpMode && (
+                                <input
+                                    type="text"
+                                    placeholder="Your name"
+                                    className="mt-8 px-10 py-2 border border-black rounded-md shadow-sm w-full max-w-md text-center"
+                                    value={userName}
+                                    onChange={(e) => setUserName(e.target.value)}
+                                />
+                            )}
+
+                            {!isOtpMode ? (
+                                <input
+                                    type="number"
+                                    placeholder="Phone number"
+                                    className="mt-4 px-10 py-2 border border-black rounded-md shadow-sm w-full max-w-md text-center"
+                                    maxLength="10"
+                                    pattern="\d*"
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                    onInput={(e) => e.target.value = e.target.value.slice(0, 10)} // Ensures the input is restricted to 10 digits
+                                />
+                            ) : (
+                                <div className="flex justify-center space-x-2 mt-8">
+                                    {otp.map((digit, index) => (
+                                        <input
+                                            key={index}
+                                            type="text"
+                                            className="w-10 h-10 text-center text-xl border border-black rounded-md"
+                                            maxLength="1"
+                                            value={digit}
+                                            onChange={e => handleOtpChange(e.target, index)}
+                                            ref={el => otpInputRefs.current[index] = el}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+
+                            <div className="px-12">
+                                <button
+                                    onClick={isOtpMode ? handleVerifyOTP : handleSubmit}
+                                    className="mt-4 bg-red-800 hover:bg-red-900 text-white font-bold py-2 px-12 rounded-xl w-full max-w-md"
+                                >
+                                    {isLoading ? (
+                                        <div className="flex justify-center items-center">
+                                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                            </svg>
+                                        </div>
+                                    ) : (
+                                        isOtpMode ? 'Verify OTP' : 'Get Started'
+                                    )}
+                                </button>
+
+                                {isOtpMode && counter > 0 && (
+                                    <p className="mt-2 text-sm flex justify-center text-gray-500">
+                                        Resend OTP in {counter} sec
+                                    </p>
+                                )}
+                                {isOtpMode && counter === 0 && (
+                                    <div className="flex justify-center text-sm">
+                                        <button onClick={handleSubmit} className="flex justify-center mt-2 text-sm underline text-blue-500">
+                                            Resend
+                                        </button>
+                                        <span className="text-sm py-2">
+                                            &nbsp;the OTP
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </div>
+
     );
 }
 

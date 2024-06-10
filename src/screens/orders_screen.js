@@ -80,7 +80,7 @@ const OrderScreen = () => {
                             <img src="https://i.pinimg.com/originals/c4/cb/9a/c4cb9abc7c69713e7e816e6a624ce7f8.gif" alt="No Order GIF" className="mx-auto mt-4" />
                         </div>
                     ) : (
-                        <div className="mt-4 mb-0 w-full px-4 overflow-auto" style={{ maxHeight: "800px" }}>
+                        <div className="mt-4 mb-0 w-full px-4 overflow-auto" style={{ maxHeight: "400px" }}>
                             {orderItems.map((item, index) => (
                                 <React.Fragment key={index}>
                                     <div className="flex justify-between items-center py-2">
