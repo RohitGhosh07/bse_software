@@ -392,20 +392,20 @@ const MenuScreen = () => {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center relative mt-1">
-  {/* Square image with rounded edges */}
-  <div className="relative">
-    <img src="assets/icons/image 3.png" alt="Item" className="rounded-md w-24 h-24" />
-    <div className="flex justify-center items-center border border-red-800 rounded-md px-2 bg-white absolute bottom-0 w-[110%] left-1/2 transform -translate-x-1/2 z-10">
-      <button className="focus:outline-none" onClick={() => { handleCountChange(category.item_category_name, item.item_id, -1) }}>➖</button>
-      {/* Display count according to local storage or show 0 */}
-      <span className="mx-2" style={{ minWidth: "2rem", textAlign: "center" }}>
-        {/* Retrieve count from local storage if available, otherwise display 0 */}
-        {localStorage.getItem(`item_${item.item_id}_count`) ? JSON.parse(localStorage.getItem(`item_${item.item_id}_count`)).count : 0}
-      </span>
-      <button className="focus:outline-none" onClick={() => handleCountChange(category.item_category_name, item.item_id, 1)}>➕</button>
-    </div>
-  </div>
-</div>
+                                                    {/* Square image with rounded edges */}
+                                                    <div className="relative">
+                                                        <img src="assets/icons/image 3.png" alt="Item" className="rounded-md w-24 h-24" />
+                                                        <div className="flex justify-center items-center border border-red-800 rounded-md px-2 bg-white absolute bottom-0 w-[110%] left-1/2 transform -translate-x-1/2 z-10">
+                                                            <button className="focus:outline-none" onClick={() => { handleCountChange(category.item_category_name, item.item_id, -1) }}>➖</button>
+                                                            {/* Display count according to local storage or show 0 */}
+                                                            <span className="mx-2" style={{ minWidth: "2rem", textAlign: "center" }}>
+                                                                {/* Retrieve count from local storage if available, otherwise display 0 */}
+                                                                {localStorage.getItem(`item_${item.item_id}_count`) ? JSON.parse(localStorage.getItem(`item_${item.item_id}_count`)).count : 0}
+                                                            </span>
+                                                            <button className="focus:outline-none" onClick={() => handleCountChange(category.item_category_name, item.item_id, 1)}>➕</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
 
                                             </div>

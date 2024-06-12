@@ -18,33 +18,31 @@ const CartScreen = () => {
     const handleConfirmation = () => {
         console.log("Action Confirmed!");
         setShowCheckmark(true); // Show the checkmark animation
-
+    
         // Retrieve items and counts from local storage
         const items = Object.keys(localStorage)
             .filter(key => key.startsWith('item_'))
             .map(key => JSON.parse(localStorage.getItem(key)))
             .filter(item => item.count > 0); // Filter items with quantity greater than 0
-
+    
         // Check if items exist in local storage
         if (!items || items.length === 0) {
-
             console.error('No items found in local storage');
             return;
         }
-
+    
         // Retrieve the customer_id from local storage
         const customerId = localStorage.getItem('customer_id');
-
+    
         // Construct the payload
         const payload = {
             customer_id: customerId,
             items: items
         };
-
+    
         // Log the payload to verify it's correct
         console.log(payload);
-
-
+    
         // Send a POST request to the server
         fetch('http://localhost:5000/order_logs', {
             method: 'POST',
@@ -53,30 +51,42 @@ const CartScreen = () => {
             },
             body: JSON.stringify(payload)
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Success:', data);
-                // Save the order ID to local storage
-                localStorage.setItem('session_id', data.session_id);
-
-                // Navigate to the "orders" screen on success
-                setTimeout(() => {
-                    setShowCheckmark(false); // Hide the checkmark animation after 2 seconds
-                    navigate('/orders');
-                }, 2100);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Handle error if necessary
-                // For example, show an error message to the user
-            });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            // Save the order ID to local storage
+            localStorage.setItem('session_id', data.session_id);
+    
+            // Empty the cart by setting count to zero for every item
+            Object.keys(localStorage)
+                .filter(key => key.startsWith('item_'))
+                .forEach(key => {
+                    const itemData = JSON.parse(localStorage.getItem(key));
+                    itemData.count = 0;
+                    localStorage.setItem(key, JSON.stringify(itemData));
+                });
+    
+            // Update the state to reflect the emptied cart
+            setItems(items.map(item => ({ ...item, count: 0 })));
+    
+            // Navigate to the "orders" screen on success
+            setTimeout(() => {
+                setShowCheckmark(false); // Hide the checkmark animation after 2 seconds
+                navigate('/orders');
+            }, 2100);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Handle error if necessary
+            // For example, show an error message to the user
+        });
     };
-
+    
 
 
 
@@ -153,7 +163,11 @@ const CartScreen = () => {
         // Update state with the new counts
         setCounts(newCount);
     };
-
+    const totalBasePrice = items.reduce((total, item) => {
+        const countItem = localStorage.getItem(`item_${item.item_id}_count`);
+        const count = countItem ? JSON.parse(countItem).count : 0;
+        return total + item.base_price * count;
+    }, 0);
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -198,6 +212,12 @@ const CartScreen = () => {
                 )
                 ))}
                 <div style={{ height: '1px', backgroundColor: '#ccc', width: '100%', marginTop: '8px' }}></div>
+                <div className="flex justify-between items-center py-2 px-4 mt-1 bg-white">
+                    <span className="text-gray-800 text-xs font-medium">Total Amount</span>
+                    {totalBasePrice.toFixed(2)}
+                </div>
+                <div style={{ height: '1px', backgroundColor: '#ccc', width: '100%', marginTop: '8px' }}></div>
+
                 <a href="/menu">
                     <div className="flex justify-between items-center py-2 px-4 mt-1 bg-white">
                         <span className="text-gray-800 text-xs font-medium">Add more items</span>

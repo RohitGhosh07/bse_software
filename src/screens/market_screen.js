@@ -30,29 +30,30 @@ const MarketScreen = () => {
         fetchItems(query);
     };
 
+    const fetchBookmarkItemId = async () => {
+        try {
+            const phoneNumber = localStorage.getItem('phone');
+            const response = await fetch(`http://127.0.0.1:5000/bookmarks?phone=${phoneNumber}`);
+            const data = await response.json();
+            console.log(JSON.stringify(data.bookmarked_items));
+
+            const bookmarkedItemIds = data.bookmarked_items;
+            const itemDetailsPromises = bookmarkedItemIds.map(async (itemId) => {
+                const itemResponse = await fetch(`http://localhost:5000/items?item_id=${itemId}`);
+                const itemData = await itemResponse.json();
+                console.log(itemData.items[0].item_name);
+                return itemData;
+            });
+            const itemDetails = await Promise.all(itemDetailsPromises);
+            setItems(itemDetails);
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching bookmarked item IDs:', error);
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchBookmarkItemId = async () => {
-            try {
-                const response = await fetch('http://127.0.0.1:5000/bookmarks?phone=9330262571');
-                const data = await response.json();
-                console.log(JSON.stringify(data.bookmarked_items));
-
-                const bookmarkedItemIds = data.bookmarked_items;
-                const itemDetailsPromises = bookmarkedItemIds.map(async (itemId) => {
-                    const itemResponse = await fetch(`http://localhost:5000/items?item_id=${itemId}`);
-                    const itemData = await itemResponse.json();
-                    console.log(itemData.items[0].item_name);
-                    return itemData;
-                });
-                const itemDetails = await Promise.all(itemDetailsPromises);
-                setItems(itemDetails);
-                setLoading(false);
-            } catch (error) {
-                console.error('Error fetching bookmarked item IDs:', error);
-                setLoading(false);
-            }
-        };
-
         fetchBookmarkItemId();
     }, []);
 
@@ -64,8 +65,8 @@ const MarketScreen = () => {
             return;
         }
         const requestBody = {
-            items_to_delete: [itemId], // Wrap the itemId in an array
-            phone: phoneNumber, // This will be sent as a string
+            items_to_delete: [itemId],
+            phone: phoneNumber,
         };
 
         try {
@@ -83,12 +84,15 @@ const MarketScreen = () => {
 
             const data = await response.json();
             console.log('Bookmark deleted:', data);
+            fetchBookmarkItemId(); // Refresh the list after deletion
+
             showSnackbar("Bookmark deleted");
         } catch (error) {
             console.error('Error deleting bookmark:', error);
             alert('Failed to delete bookmark');
         }
     };
+
 
     const randomData = () => ({
         labels: Array.from({ length: 7 }, (_, i) => `Point ${i + 1}`),
@@ -163,7 +167,9 @@ const MarketScreen = () => {
 
             const data = await response.json();
             console.log('Response:', data);
+            fetchBookmarkItemId();
             showSnackbar("Bookmarked");
+
 
             // Close the dropdown after successfully bookmarking
             console.log('Dropdown closed');
