@@ -198,46 +198,46 @@ const MarketScreen = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center justify-start min-h-screen">
             <div className="w-full fixed top-0 pt-2 bg-white z-50">
                 <div className="flex flex-col items-center">
                     <img src="https://i.ibb.co/gPPqZfg/bse-demo-logo.png" alt="Center Image" className="object-cover w-20 h-auto" />
                     <h1 className="text-xl mt-4 font-black">Items</h1>
                 </div>
-                <div className="mt-4 mb-0 w-full px-4 relative">
+                <div className="mt-4 mb-0 w-full px-4 relative" ref={dropdownRef}>
                     <input
                         type="text"
                         placeholder="Search items..."
                         value={searchQuery}
                         onChange={handleSearch}
-                        onFocus={toggleDropdown}
-
+                        // onClick={}
+                        onFocus={() => setDropdownVisible(true)}
                         className="w-full p-2 border border-gray-300 rounded-md shadow-md"
                     />
                     {dropdownVisible && (
                         <div className="relative">
-                            {searchResults.length > 0 && (
+            {searchResults && searchResults.length > 0 ? (
                                 <div className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-300 rounded-md shadow-md max-h-48 overflow-y-auto">
                                     {searchResults.map((item, index) => (
                                         <div
                                             key={index}
                                             className="border-b border-gray-300 p-2 cursor-pointer"
-                                            onClick={() => {
-                                                handleItemClick(item.item_id);
-                                                toggleDropdown();
-                                            }}
+                                            onClick={() => handleItemClick(item.item_id)}
                                         >
                                             <p>{item.item_name}</p>
-                                            {/* Add more item details here if needed */}
                                         </div>
                                     ))}
+                                </div>
+                            ) : (
+                                <div className="absolute z-50 top-full mt-1 w-full bg-white border border-gray-300 rounded-md shadow-md p-2">
+                                    <p>No results found</p>
                                 </div>
                             )}
                         </div>
                     )}
                 </div>
             </div>
-            <div className="pt-40 mt-8 pb-20 w-full overflow-auto">
+            <div className="pt-32 mt-12 pb-20 w-full overflow-auto">
                 {items.map((itemData, index) => (
                     <React.Fragment key={index}>
                         <div
@@ -337,6 +337,7 @@ const MarketScreen = () => {
             </div>
             <BottomNavbar />
         </div>
+
     );
 }
 
