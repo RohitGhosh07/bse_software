@@ -19,27 +19,28 @@ const OrderScreen = () => {
                 }
 
                 const response = await fetch(`http://localhost:5000/order_logs?session_id=${sessionId}`);
-                console.log(response)
                 if (!response.ok) {
                     throw new Error('Failed to fetch order details');
                 }
-                const data = await response.json();
-                const itemPromises = data.order_logs.map(async (item) => {
-                    const itemResponse = await fetch(`http://localhost:5000/items?item_id=${item.item_id}`);
-                    if (!itemResponse.ok) {
-                        throw new Error('Failed to fetch item details');
-                    }
-                    const itemData = await itemResponse.json();
-                    console.log(itemData.items[0].item_name);
-                    console.log(item.item_id);
 
-                    return {
-                        ...item,
-                        item_name: itemData.items[0].item_name,
-                        base_price: itemData.items[0].base_price,
-                    };
-                });
-                const updatedOrderItems = await Promise.all(itemPromises);
+                const data = await response.json();
+                const allItemPromises = data.order_logs.flatMap(order =>
+                    order.items.map(async (item) => {
+                        const itemResponse = await fetch(`http://localhost:5000/items?item_id=${item.item_id}`);
+                        if (!itemResponse.ok) {
+                            throw new Error('Failed to fetch item details');
+                        }
+
+                        const itemData = await itemResponse.json();
+                        return {
+                            ...item,
+                            item_name: itemData.items[0].item_name,
+                            base_price: itemData.items[0].base_price,
+                        };
+                    })
+                );
+
+                const updatedOrderItems = await Promise.all(allItemPromises);
                 setOrderItems(updatedOrderItems);
                 setLoading(false);
 
@@ -107,7 +108,6 @@ const OrderScreen = () => {
                                 </React.Fragment>
                             ))}
                         </div>
-
                     )}
                 </div>
             </div>

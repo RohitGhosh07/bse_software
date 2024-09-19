@@ -41,6 +41,17 @@ const MenuIcon = ({ color }) => (
     </svg>
 
 );
+const ProfileIcon = ({ color }) => (
+  <svg width="52" height="52" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" fill="none">
+    {/* Head */}
+    <circle cx="26" cy="17" r="10" fill={color} />
+    {/* Body */}
+    <path
+      d="M36 38C36 32.4772 31.5228 28 26 28C20.4772 28 16 32.4772 16 38V42H36V38Z"
+      fill={color}
+    />
+  </svg>
+);
 
 // const getTotalItemCount = () => {
 //     let totalCount = 0;
@@ -136,7 +147,8 @@ const BottomNavbar = () => {
         { name: 'Orders', Icon: OrdersIcon, path: '/orders' },
         { name: 'Market', Icon: MarketIcon, path: '/market' },
         { name: 'Menu', Icon: MenuIcon, path: '/menu' },
-        { name: 'Cart', Icon: Cart, path: '/cart' }
+        { name: 'Cart', Icon: Cart, path: '/cart' },
+        { name: 'Profile', Icon: ProfileIcon, path: '/profile' }
     ];
 
     return (

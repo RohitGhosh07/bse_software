@@ -4,6 +4,7 @@ import MenuScreen from './screens/menu_screen';
 import MarketScreen from './screens/market_screen';
 import CartScreen from './screens/cart_screen';
 import OrderScreen from './screens/orders_screen';
+import ProfileScreen from './screens/profile_screen';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/market" element={<MarketScreen />} />
         <Route path="/cart" element={<CartScreen />} />
         <Route path="/orders" element={<OrderScreen />} />
+        <Route path="/profile" element={<ProfileScreen />} />
       </Routes>
     </Router>
   );

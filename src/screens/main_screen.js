@@ -58,10 +58,10 @@ const MainScreen = () => {
 
     const handleVerifyOTP = () => {
         setIsLoading(true);
-
+    
         const enteredOTP = otp.join('');
         const idValue = id;
-
+    
         fetch(`${process.env.REACT_APP_BACKEND_MAIN_URI}/verify-otp`, {
             method: 'POST',
             headers: {
@@ -71,20 +71,26 @@ const MainScreen = () => {
         })
             .then(response => {
                 if (response.ok) {
-                    console.log('OTP verification successful');
-                    navigate('/menu'); // Navigate to the "another" screen on success
+                    return response.json(); // Parse the JSON from the response
                 } else {
-                    console.error('OTP verification failed:', response.status);
-                    showSnackbar('Invalid OTP');
+                    throw new Error('OTP verification failed');
                 }
+            })
+            .then(data => {
+                console.log('OTP verification successful');
+                localStorage.setItem('session_id', data.session_id); // Store the session_id in local storage
+                console.log('Session ID:', data.session_id); // Log the session_id
+                navigate('/menu'); // Navigate to the "menu" screen on success
             })
             .catch(error => {
                 console.error('Error verifying OTP:', error);
+                showSnackbar('Invalid OTP');
             })
             .finally(() => {
                 setIsLoading(false);
             });
     };
+    
 
     useEffect(() => {
         let interval = null;

@@ -16,9 +16,6 @@ const CartScreen = () => {
     const [noOrder, setNoOrder] = useState(false);
 
     const handleConfirmation = () => {
-        console.log("Action Confirmed!");
-        setShowCheckmark(true); // Show the checkmark animation
-    
         // Retrieve items and counts from local storage
         const items = Object.keys(localStorage)
             .filter(key => key.startsWith('item_'))
@@ -51,42 +48,65 @@ const CartScreen = () => {
             },
             body: JSON.stringify(payload)
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Success:', data);
-            // Save the order ID to local storage
-            localStorage.setItem('session_id', data.session_id);
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 400) {
+                        throw new Error('Insufficient balance');
+                    } else if (response.status === 404) {
+                        throw new Error('Customer or item not found');
+                    } else {
+                        throw new Error('Network response was not ok');
+                    }
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                console.log('Session ID:', data.session_id); // Log the session_id
     
-            // Empty the cart by setting count to zero for every item
-            Object.keys(localStorage)
-                .filter(key => key.startsWith('item_'))
-                .forEach(key => {
-                    const itemData = JSON.parse(localStorage.getItem(key));
-                    itemData.count = 0;
-                    localStorage.setItem(key, JSON.stringify(itemData));
-                });
+                // Save the order ID to local storage
+                localStorage.setItem('order_id', data.order_id);
+                
+                // Empty the cart by setting count to zero for every item
+                Object.keys(localStorage)
+                    .filter(key => key.startsWith('item_'))
+                    .forEach(key => {
+                        const itemData = JSON.parse(localStorage.getItem(key));
+                        itemData.count = 0;
+                        localStorage.setItem(key, JSON.stringify(itemData));
+                    });
     
-            // Update the state to reflect the emptied cart
-            setItems(items.map(item => ({ ...item, count: 0 })));
+                // Update the state to reflect the emptied cart
+                setItems(items.map(item => ({ ...item, count: 0 })));
     
-            // Navigate to the "orders" screen on success
-            setTimeout(() => {
-                setShowCheckmark(false); // Hide the checkmark animation after 2 seconds
-                navigate('/orders');
-            }, 2100);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // Handle error if necessary
-            // For example, show an error message to the user
-        });
+                // Show the checkmark animation
+                setShowCheckmark(true);
+    
+                // Navigate to the "orders" screen on success
+                setTimeout(() => {
+                    setShowCheckmark(false); // Hide the checkmark animation after 2 seconds
+                    navigate('/orders');
+                }, 2100);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Handle error if necessary
+                // For example, show an error message to the user
+                if (error.message === 'Insufficient balance') {
+                    console.error('Insufficient balance');
+                    // Show an error message to the user
+                } else if (error.message === 'Customer or item not found') {
+                    console.error('Customer or item not found');
+                    // Show an error message to the user
+                } else {
+                    console.error('Network error');
+                    // Show a general error message to the user
+                }
+            });
     };
     
+
+
 
 
 

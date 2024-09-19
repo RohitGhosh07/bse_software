@@ -157,7 +157,40 @@ const MenuScreen = () => {
     const [counts, setCounts] = useState({});
     const [loading, setLoading] = useState(true); // State to track loading status
     const [selectedBrandId, setSelectedBrandId] = useState(null);
+    const [balance, setBalance] = useState(null);
 
+    useEffect(() => {
+        const fetchBalance = async () => {
+            try {
+                // Get the session_id from local storage
+                const customer_id = localStorage.getItem('customer_id');
+
+                const response = await fetch(`http://localhost:5000/wallets?customer_id=${customer_id}`);
+                const data = await response.json();
+                
+                // console.log('Data:', data);
+                
+                // Extract the current_amount from the first wallet in the array
+                if (data.wallets && data.wallets.length > 0) {
+                    const currentAmount = data.wallets[0].current_amount;
+                    setBalance(currentAmount);
+                    // console.log('Current balance:', currentAmount);
+                } else {
+                    console.log('No wallets found.');
+                    setBalance(0); // Or handle the case where no wallets are found
+                }
+            } catch (error) {
+                console.error('Error fetching balance:', error);
+            }
+        };
+
+        const intervalId = setInterval(fetchBalance, 1000); // Call fetchBalance every 3 seconds
+
+        return () => {
+            clearInterval(intervalId); // Clean up the interval when the component unmounts
+        };
+    }, []);
+    
 
     useEffect(() => {
         setLoading(true); // Set loading to true before fetching data
@@ -286,7 +319,7 @@ const MenuScreen = () => {
                                 <path d="M14.449 5.07894C13.088 5.07894 11.981 3.97162 11.981 2.61088C11.981 1.25014 13.088 0.142822 14.449 0.142822C15.81 0.142822 16.9168 1.24985 16.9168 2.61088C16.9168 3.97191 15.8098 5.07894 14.449 5.07894ZM14.449 0.713604C13.4028 0.713604 12.5517 1.56464 12.5517 2.61088C12.5517 3.65712 13.4028 4.50816 14.449 4.50816C15.495 4.50816 16.346 3.65712 16.346 2.61088C16.346 1.56464 15.495 0.713604 14.449 0.713604Z" fill="black" />
                             </svg>
 
-                            <span className="ml-2 text-lg font-semibold">₹5,000</span>
+                            <span className="ml-2 text-lg font-semibold">₹{balance}</span>
                         </div>
                     </div>
 
